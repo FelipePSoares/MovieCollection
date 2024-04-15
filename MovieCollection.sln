@@ -3,9 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieCollection.Server", "MovieCollection.Server\MovieCollection.Server.csproj", "{CEB1CC8B-2919-49FA-9891-0C8F6366399E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MovieCollection.Server", "MovieCollection.Server\MovieCollection.Server.csproj", "{CEB1CC8B-2919-49FA-9891-0C8F6366399E}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "moviecollection.client", "moviecollection.client\moviecollection.client.esproj", "{305D89A5-DC28-413E-874A-D0900A81DD3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieCollection.Domain", "MovieCollection.Domain\MovieCollection.Domain.csproj", "{EE7D1E8D-B22D-4518-870E-CD5825031866}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieCollection.Infrastructure", "MovieCollection.Infrastructure\MovieCollection.Infrastructure.csproj", "{F84F9853-DB0E-4737-B794-4B479C2E22E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieCollection.Persistence", "MovieCollection.Persistence\MovieCollection.Persistence.csproj", "{E23C49A4-069B-44C9-BE95-B2EB848C89B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieCollection.Application", "MovieCollection.Application\MovieCollection.Application.csproj", "{8F552C24-CC04-4476-8C84-45895F96CD37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +31,22 @@ Global
 		{305D89A5-DC28-413E-874A-D0900A81DD3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{305D89A5-DC28-413E-874A-D0900A81DD3D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{305D89A5-DC28-413E-874A-D0900A81DD3D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EE7D1E8D-B22D-4518-870E-CD5825031866}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE7D1E8D-B22D-4518-870E-CD5825031866}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE7D1E8D-B22D-4518-870E-CD5825031866}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE7D1E8D-B22D-4518-870E-CD5825031866}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84F9853-DB0E-4737-B794-4B479C2E22E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84F9853-DB0E-4737-B794-4B479C2E22E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84F9853-DB0E-4737-B794-4B479C2E22E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84F9853-DB0E-4737-B794-4B479C2E22E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E23C49A4-069B-44C9-BE95-B2EB848C89B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E23C49A4-069B-44C9-BE95-B2EB848C89B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E23C49A4-069B-44C9-BE95-B2EB848C89B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E23C49A4-069B-44C9-BE95-B2EB848C89B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F552C24-CC04-4476-8C84-45895F96CD37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F552C24-CC04-4476-8C84-45895F96CD37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F552C24-CC04-4476-8C84-45895F96CD37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F552C24-CC04-4476-8C84-45895F96CD37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
