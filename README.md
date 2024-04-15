@@ -4,7 +4,7 @@
 
 ## Live Demo
 
-- http://felipesoares-001-site4.itempurl.com/
+- http://felipesoares-001-site4.itempurl.com
 
 ## Pre requirements
 
