@@ -17,10 +17,22 @@ namespace MovieCollection.Server.Extensions
             services.AddAuthorizationBuilder();
 
             services.AddIdentityCore<User>()
-                .AddRoles<IdentityRole<Guid>>()
                 .AddSignInManager()
                 .AddEntityFrameworkStores<MovieCollectionDatabaseContext>()
                 .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 8;
+                // Default SignIn settings.
+                options.SignIn.RequireConfirmedEmail = false;
+                options.User.RequireUniqueEmail = true;
+            });
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
@@ -41,9 +53,7 @@ namespace MovieCollection.Server.Extensions
                     config.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(tokenSettings.SecretKey)
-                        ),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettings.SecretKey)),
                         ValidateIssuer = !string.IsNullOrEmpty(tokenSettings.Issuer),
                         ValidIssuer = tokenSettings.Issuer,
                         ValidateAudience = !string.IsNullOrEmpty(tokenSettings.Audience),

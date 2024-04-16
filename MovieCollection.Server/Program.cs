@@ -1,14 +1,20 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using MovieCollection.Domain.AccessControl;
 using MovieCollection.Persistence;
+using MovieCollection.Application.Features;
 using MovieCollection.Server.Extensions;
 using Newtonsoft.Json.Converters;
+using MovieCollection.Infrastructure.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var tokenSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSettings>() ?? default!;
+builder.Services.AddSingleton(tokenSettings);
+
 // Add services to the container.
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddAuthenticationServices(builder.Configuration);
 
 builder.Services.AddControllers(config =>
 {
@@ -24,7 +30,6 @@ builder.Services.AddControllers(config =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthenticationServices(builder.Configuration);
 
 var app = builder.Build();
 
