@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MovieCollection.Application.Features.AccessControl.DTOs;
 using MovieCollection.Application.Features.AccessControl.Mappers;
 using MovieCollection.Domain.AccessControl;
@@ -80,16 +82,26 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserRefreshTokenResponse>.Success(token);
         }
 
-        public async Task<AppResponse> UserRegisterAsync(UserRegisterRequest request)
+        public async Task<AppResponse<UserProfileResponse>> UserRegisterAsync(UserRegisterRequest request)
         {
             var user = request.FromDTO();
 
             var result = await this.userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
-                return AppResponse.Success();
+                return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
             else
-                return AppResponse.Error(GetRegisterErrors(result));
+                return AppResponse<UserProfileResponse>.Error(GetRegisterErrors(result));
+        }
+
+        public async Task<AppResponse<UserProfileResponse>> GetUserByIdAsync(Guid id)
+        {
+            var user = await this.userManager.Users.Include(user => user.MovieCollection).FirstOrDefaultAsync(user => user.Id == id);
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
 
         private Dictionary<string, string> GetRegisterErrors(IdentityResult result)

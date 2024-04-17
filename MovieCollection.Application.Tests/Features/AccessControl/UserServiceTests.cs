@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Identity;
 using Moq;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
+using MovieCollection.Common.Tests;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.Authentication;
 
 namespace MovieCollection.Application.Tests.Features.AccessControl
 {
-    public class UserServiceTests
+    public class UserServiceTests : BaseTests
     {
         private readonly Mock<UserManager<User>> userManagerMock;
         private readonly Mock<SignInManager<User>> signInManagerMock;
@@ -48,6 +49,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             // Assert
             response.IsSucceed.Should().BeTrue();
             response.Messages.Should().BeEmpty();
+            response.Data.Should().NotBeNull();
         }
 
         [Fact]

@@ -1,18 +1,21 @@
 ﻿using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
+using MovieCollection.Domain.AccessControl;
+using MovieCollection.Infrastructure;
 
 namespace MovieCollection.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
+    [Route("[controller]")]
     public class UserController(IUserService userService) : BaseController
     {
         private readonly IUserService userService = userService;
 
-        [HttpPost]
+        [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<IActionResult> Register(UserRegisterRequest req)
         {
@@ -21,7 +24,7 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.Created);
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserLoginRequest req)
         {
@@ -30,7 +33,7 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken(UserRefreshTokenRequest req)
         {
@@ -39,7 +42,7 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> Logout()
         {
             var result = await userService.UserLogoutAsync(User);
@@ -47,10 +50,22 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
-        [HttpPost]
-        public string Profile()
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Profile()
         {
-            return User.FindFirst("UserName")?.Value ?? "";
+            var userId = User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+
+            var result = await userService.GetUserByIdAsync(new Guid(userId));
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> Profile(Guid userId)
+        {
+            var result = await userService.GetUserByIdAsync(userId);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
         }
     }
 }
