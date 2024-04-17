@@ -104,6 +104,24 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
 
+        public async Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto)
+        {
+            var userId = userLogged.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await this.userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
+            user.HasIncompletedInformation = false;
+
+            await this.userManager.UpdateAsync(user);
+            await this.UserLogoutAsync(userLogged);
+
+            return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+        }
+
         private Dictionary<string, string> GetRegisterErrors(IdentityResult result)
         {
             var errorDictionary = new Dictionary<string, string>(1);
@@ -144,24 +162,6 @@ namespace MovieCollection.Application.Features.AccessControl
             await userManager.SetAuthenticationTokenAsync(user, this.tokenProvider, this.tokenPurpose, refreshToken);
 
             return (AccessToken: token, RefreshToken: refreshToken);
-        }
-
-        public async Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto)
-        {
-            var userId = userLogged.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await this.userManager.FindByIdAsync(userId);
-
-            if (user == null)
-                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
-
-            user.FirstName = userDto.FirstName;
-            user.LastName = userDto.LastName;
-            user.HasIncompletedInformation = false;
-
-            await this.userManager.UpdateAsync(user);
-            await this.UserLogoutAsync(userLogged);
-
-            return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
     }
 }

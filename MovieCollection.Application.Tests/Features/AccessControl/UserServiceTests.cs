@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -280,6 +281,51 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             // Assert
             response.IsSucceed.Should().BeFalse();
             response.Messages.Should().Contain(nameof(userRefreshTokenRequest.RefreshToken), ValidationMessages.RefreshTokenExpired);
+        }
+
+        [Fact]
+        public async Task SetUserNameAsync_SucceedUpdate_ShouldReturnIsSucceedTrue()
+        {
+            // Arrange
+            User expectedUser = new User();
+            var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+            var userDto = Fixture.Create<UserSetNameRequest>();
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.UpdateAsync(It.IsAny<User>()))
+                .Callback((User u) => expectedUser = u)
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var response = await this.userService.SetUserNameAsync(user, userDto);
+
+            // Assert
+            response.IsSucceed.Should().BeTrue();
+            response.Messages.Should().BeEmpty();
+            expectedUser.FirstName.Should().Be(userDto.FirstName);
+            expectedUser.LastName.Should().Be(userDto.LastName);
+            expectedUser.HasIncompletedInformation.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task SetUserNameAsync_UserNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+            var userDto = Fixture.Create<UserSetNameRequest>();
+
+            // Act
+            var response = await this.userService.SetUserNameAsync(user, userDto);
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
         }
 
         private string GenerateToken(TokenSettings tokenSettings)
