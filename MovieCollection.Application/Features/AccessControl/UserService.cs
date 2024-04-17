@@ -41,6 +41,9 @@ namespace MovieCollection.Application.Features.AccessControl
             if (user == null)
                 return AppResponse<UserLoginResponse>.Error(nameof(request.Email), ValidationMessages.EmailNotFound);
 
+            if (!user.Enabled)
+                return AppResponse<UserLoginResponse>.Error("Blocked", string.Empty);
+
             var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (result.Succeeded)
             {
@@ -76,6 +79,9 @@ namespace MovieCollection.Application.Features.AccessControl
 
             if (user == null)
                 return AppResponse<UserRefreshTokenResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            if (!user.Enabled)
+                return AppResponse<UserRefreshTokenResponse>.Error("Blocked", string.Empty);
 
             if (!await this.userManager.VerifyUserTokenAsync(user, this.tokenProvider, this.tokenPurpose, request.RefreshToken))
                 return AppResponse<UserRefreshTokenResponse>.Error(nameof(request.RefreshToken), ValidationMessages.RefreshTokenExpired);
@@ -151,7 +157,10 @@ namespace MovieCollection.Application.Features.AccessControl
             if (user == null)
                 return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
 
-            var result = await this.userManager.SetLockoutEnabledAsync(user, true);
+            user.Enabled = false;
+
+            var result = await this.userManager.UpdateAsync(user);
+            await this.LogoutAsync(user);
 
             if (result.Succeeded)
                 return AppResponse.Success();
