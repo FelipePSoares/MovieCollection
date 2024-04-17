@@ -40,16 +40,23 @@ namespace MovieCollection.Persistence
 
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-                var admin = new User()
+                if (userManager.FindByEmailAsync("admin@admin.com").GetAwaiter().GetResult() == null)
                 {
-                    UserName = "Admin",
-                    Email = "admin@admin.com",
-                    FirstName = "Admin",
-                    LastName = "Admin",
-                    HasIncompletedInformation = false
-                };
-                userManager.CreateAsync(admin, "Admin@123456").GetAwaiter().GetResult();
-                userManager.AddToRoleAsync(admin, "Administrator").GetAwaiter().GetResult();
+                    var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                    var adminRole = new IdentityRole<Guid>("Administrator");
+                    roleManager.CreateAsync(adminRole).GetAwaiter().GetResult();
+
+                    var admin = new User()
+                    {
+                        UserName = "Admin",
+                        Email = "admin@admin.com",
+                        FirstName = "Admin",
+                        LastName = "Admin",
+                        HasIncompletedInformation = false
+                    };
+                    userManager.CreateAsync(admin, "Admin@123456").GetAwaiter().GetResult();
+                    userManager.AddToRoleAsync(admin, "Administrator").GetAwaiter().GetResult();
+                }
             }
 
             return app;

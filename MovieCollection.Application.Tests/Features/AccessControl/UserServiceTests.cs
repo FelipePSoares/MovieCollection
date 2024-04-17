@@ -17,22 +17,27 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
     {
         private readonly Mock<UserManager<User>> userManagerMock;
         private readonly Mock<SignInManager<User>> signInManagerMock;
+        private readonly Mock<RoleManager<IdentityRole<Guid>>> roleManagerMock;
         private readonly TokenSettings tokenSettings;
         private readonly UserService userService;
 
         public UserServiceTests()
         {
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             var store = new Mock<IUserStore<User>>();
             this.userManagerMock = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
             var contextAccessorMock = new Mock<IHttpContextAccessor>();
             var claimsFactoryMock = new Mock<IUserClaimsPrincipalFactory<User>>();
             this.signInManagerMock = new Mock<SignInManager<User>>(this.userManagerMock.Object, contextAccessorMock.Object, claimsFactoryMock.Object, null, null, null);
+            var roleStore = new Mock<IRoleStore<IdentityRole<Guid>>>();
+            this.roleManagerMock = new Mock<RoleManager<IdentityRole<Guid>>>(roleStore.Object, null, null, null, null);
             this.tokenSettings = new TokenSettings()
             {
                 SecretKey = Guid.NewGuid().ToString()
             };
 
-            this.userService = new UserService(this.userManagerMock.Object, this.signInManagerMock.Object, this.tokenSettings);
+            this.userService = new UserService(this.userManagerMock.Object, this.signInManagerMock.Object, this.roleManagerMock.Object, this.tokenSettings);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Fact]
@@ -98,6 +103,9 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
             this.userManagerMock.Setup(userManager => userManager.GenerateUserTokenAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(refreshToken);
+
+            this.userManagerMock.Setup(userManager => userManager.GetRolesAsync(It.IsAny<User>()))
+                .ReturnsAsync(new List<string>());
 
             this.signInManagerMock.Setup(signInManager => signInManager.CheckPasswordSignInAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<bool>()))
                 .ReturnsAsync(SignInResult.Success);
@@ -231,6 +239,9 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             this.userManagerMock.Setup(userManager => userManager.GetClaimsAsync(It.IsAny<User>()))
                 .ReturnsAsync(new List<Claim>());
 
+            this.userManagerMock.Setup(userManager => userManager.GetRolesAsync(It.IsAny<User>()))
+                .ReturnsAsync(new List<string>());
+
             // Act
             var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
 
@@ -326,6 +337,127 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             // Assert
             response.IsSucceed.Should().BeFalse();
             response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
+        }
+
+        [Fact]
+        public async Task RemoveUserAsync_SucceedRemoved_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+            var userDto = Fixture.Create<UserSetNameRequest>();
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.DeleteAsync(It.IsAny<User>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var response = await this.userService.RemoveUserAsync(user);
+
+            // Assert
+            response.IsSucceed.Should().BeTrue();
+            response.Messages.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task RemoveUserAsync_ErrorOnRemove_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+            var userDto = Fixture.Create<UserSetNameRequest>();
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.DeleteAsync(It.IsAny<User>()))
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError()
+                {
+                    Code = "code",
+                    Description = "description"
+                }));
+
+            // Act
+            var response = await this.userService.RemoveUserAsync(user);
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().Contain("code", "description");
+        }
+
+        [Fact]
+        public async Task RemoveUserAsync_UserNotExist_ShouldReturnIsSucceedTrue()
+        {
+            // Arrange
+            var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var identity = new ClaimsIdentity(claims, "test");
+            var user = new ClaimsPrincipal(identity);
+
+            this.userManagerMock.Setup(userManager => userManager.DeleteAsync(It.IsAny<User>()))
+                .Verifiable();
+
+            // Act
+            var response = await this.userService.RemoveUserAsync(user);
+
+            // Assert
+            response.IsSucceed.Should().BeTrue();
+            this.userManagerMock.Verify(userManager => userManager.DeleteAsync(It.IsAny<User>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task BlockUserAsync_SucceedBlocked_ShouldReturnIsSucceedTrue()
+        {
+            // Arrange
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.SetLockoutEnabledAsync(It.IsAny<User>(), It.IsAny<bool>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var response = await this.userService.BlockUserAsync(Guid.NewGuid());
+
+            // Assert
+            response.IsSucceed.Should().BeTrue();
+            response.Messages.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task BlockUserAsync_UserNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            // Act
+            var response = await this.userService.BlockUserAsync(Guid.NewGuid());
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
+        }
+
+        [Fact]
+        public async Task BlockUserAsync_FailureOnBlock_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.SetLockoutEnabledAsync(It.IsAny<User>(), It.IsAny<bool>()))
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError()
+                {
+                    Code = "code",
+                    Description = "description"
+                }));
+
+            // Act
+            var response = await this.userService.BlockUserAsync(Guid.NewGuid());
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().Contain("code", "description");
         }
 
         private string GenerateToken(TokenSettings tokenSettings)
