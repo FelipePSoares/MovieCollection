@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MovieCollection.Domain.AccessControl;
+using MovieCollection.Persistence.Mapping;
 
 namespace MovieCollection.Persistence
 {
@@ -10,6 +11,10 @@ namespace MovieCollection.Persistence
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new GenreConfiguration());
+            modelBuilder.ApplyConfiguration(new MovieConfiguration());
+            modelBuilder.ApplyConfiguration(new UserMovieConfiguration());
+
             base.OnModelCreating(modelBuilder);
         }
     }
