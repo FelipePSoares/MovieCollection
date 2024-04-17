@@ -122,6 +122,27 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
+        public async Task UserLoginAsync_UserBlocked_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var refreshToken = Guid.NewGuid().ToString();
+            var user = new UserLoginRequest();
+
+            this.userManagerMock.Setup(userManager => userManager.FindByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User()
+                {
+                    Enabled = false
+                });
+
+            // Act
+            var response = await this.userService.UserLoginAsync(user);
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().ContainKey("Blocked");
+        }
+
+        [Fact]
         public async Task UserLoginAsync_EmailNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
         {
             // Arrange
@@ -247,6 +268,30 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
             // Assert
             response.IsSucceed.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task UserRefreshTokenAsync_UserBlocked_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var token = GenerateToken(this.tokenSettings);
+            var userRefreshTokenRequest = new UserRefreshTokenRequest()
+            {
+                AccessToken = token,
+            };
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User()
+                {
+                    Enabled = false
+                });
+
+            // Act
+            var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().ContainKey("Blocked");
         }
 
         [Fact]
@@ -415,7 +460,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(new User());
 
-            this.userManagerMock.Setup(userManager => userManager.SetLockoutEnabledAsync(It.IsAny<User>(), It.IsAny<bool>()))
+            this.userManagerMock.Setup(userManager => userManager.UpdateAsync(It.IsAny<User>()))
                 .ReturnsAsync(IdentityResult.Success);
 
             // Act
@@ -445,7 +490,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(new User());
 
-            this.userManagerMock.Setup(userManager => userManager.SetLockoutEnabledAsync(It.IsAny<User>(), It.IsAny<bool>()))
+            this.userManagerMock.Setup(userManager => userManager.UpdateAsync(It.IsAny<User>()))
                 .ReturnsAsync(IdentityResult.Failed(new IdentityError()
                 {
                     Code = "code",
