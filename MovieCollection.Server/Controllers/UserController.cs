@@ -35,6 +35,9 @@ namespace MovieCollection.Server.Controllers
         {
             var result = await userService.UserLoginAsync(req);
 
+            if (!result.IsSucceed && result.Messages.ContainsKey("Blocked"))
+                return Forbid();
+
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
@@ -45,6 +48,9 @@ namespace MovieCollection.Server.Controllers
         public async Task<IActionResult> RefreshToken(UserRefreshTokenRequest req)
         {
             var result = await userService.UserRefreshTokenAsync(req);
+
+            if (!result.IsSucceed && result.Messages.ContainsKey("Blocked"))
+                return Forbid();
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }
