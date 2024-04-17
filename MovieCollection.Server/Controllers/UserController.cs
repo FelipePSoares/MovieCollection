@@ -61,9 +61,17 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<IActionResult> Profile(Guid userId)
+        public async Task<IActionResult> GetById(Guid userId)
         {
             var result = await userService.GetUserByIdAsync(userId);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpPut("[action]")]
+        public async Task<IActionResult> SetUserNameAsync(UserSetNameRequest userDto)
+        {
+            var result = await userService.SetUserNameAsync(User, userDto);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

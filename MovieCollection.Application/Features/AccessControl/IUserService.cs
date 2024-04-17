@@ -13,5 +13,6 @@ namespace MovieCollection.Application.Features.AccessControl
         Task<AppResponse<UserRefreshTokenResponse>> UserRefreshTokenAsync(UserRefreshTokenRequest req);
         Task<AppResponse<UserProfileResponse>> UserRegisterAsync(UserRegisterRequest req);
         Task<AppResponse<UserProfileResponse>> GetUserByIdAsync(Guid id);
+        Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto);
     }
 }

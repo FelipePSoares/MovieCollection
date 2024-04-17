@@ -12,7 +12,7 @@ namespace MovieCollection.Application.Tests.Features.Mappers
         public void ToMovieResponse_MapData_ShouldBeMappedCorrectly()
         {
             // Arrange
-            var movie = fixture.Create<Movie>();
+            var movie = Fixture.Create<Movie>();
 
             // Act
             var movieResponse = movie.ToMovieResponse();
@@ -30,12 +30,10 @@ namespace MovieCollection.Application.Tests.Features.Mappers
         public void ToMovieResponse_MapListOfData_ShouldBeMappedCorrectly()
         {
             // Arrange
-            var movies = fixture.Create<List<Movie>>();
+            var movies = Fixture.Create<List<Movie>>();
 
             // Act
             var moviesResponse = movies.ToMovieResponse();
-
-            // Assert
 
             // Assert
             moviesResponse.Should().HaveCount(movies.Count);

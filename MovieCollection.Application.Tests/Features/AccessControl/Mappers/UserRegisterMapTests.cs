@@ -12,7 +12,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl.Mappers
         public void FromDTO_MapData_ShouldBeMappedCorrectly()
         {
             // Arrange
-            var userRegister = this.fixture.Create<UserRegisterRequest>();
+            var userRegister = Fixture.Create<UserRegisterRequest>();
 
             // Act
             var user = userRegister.FromDTO();

@@ -175,7 +175,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
         public static IEnumerable<object[]> TokenInfoData()
         {
-            var user = new Fixture().Create<User>();
+            var user = Fixture.Create<User>();
 
             yield return new object[] { user, user.Id.ToString(), ClaimTypes.NameIdentifier };
             yield return new object[] { user, user.FirstName.ToString(), ClaimTypes.GivenName };

@@ -12,7 +12,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl.Mappers
         public void ToUserProfileResponse_MapData_ShouldBeMappedCorrectly()
         {
             // Arrange
-            var user = this.fixture.Create<User>();
+            var user = Fixture.Create<User>();
 
             // Act
             var userProfile = user.ToUserProfileResponse();

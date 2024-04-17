@@ -12,7 +12,7 @@ namespace MovieCollection.Application.Tests.Features.Mappers
         public void ToGenreResponse_MapData_ShouldBeMappedCorrectly()
         {
             // Arrange
-            var genre = fixture.Create<Genre>();
+            var genre = Fixture.Create<Genre>();
 
             // Act
             var genreResponse = genre.ToGenreResponse();
@@ -26,7 +26,7 @@ namespace MovieCollection.Application.Tests.Features.Mappers
         public void ToGenreResponse_MapListOfData_ShouldBeMappedCorrectly()
         {
             // Arrange
-            var genres = fixture.Create<List<Genre>>();
+            var genres = Fixture.Create<List<Genre>>();
 
             // Act
             var genresResponse = genres.ToGenreResponse();
