@@ -19,7 +19,8 @@ namespace MovieCollection.Server.Extensions
             services.AddIdentityCore<User>()
                 .AddSignInManager()
                 .AddEntityFrameworkStores<MovieCollectionDatabaseContext>()
-                .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>();
+                .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
+                .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
 
             services.Configure<IdentityOptions>(options =>
             {

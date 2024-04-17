@@ -6,7 +6,7 @@ namespace MovieCollection.Infrastructure
     {
         private readonly static AppResponse success = new AppResponse();
 
-        public bool IsSucceed { get; private set; } = true;
+        public bool IsSucceed { get; protected set; } = true;
         public Dictionary<string, string> Messages { get; protected set; } = new Dictionary<string, string>();
 
         public static AppResponse Success() => success;
@@ -59,6 +59,19 @@ namespace MovieCollection.Infrastructure
         {
             var result = success;
             result.Data = data;
+            result.Messages = message;
+            return result;
+        }
+
+        public new static AppResponse<T> Error(string key, string value)
+        {
+            var result = new AppResponse<T>() { IsSucceed = false };
+            result.Messages.Add(key, value);
+            return result;
+        }
+        public new static AppResponse<T> Error(Dictionary<string, string> message)
+        {
+            var result = new AppResponse<T>() { IsSucceed = false };
             result.Messages = message;
             return result;
         }

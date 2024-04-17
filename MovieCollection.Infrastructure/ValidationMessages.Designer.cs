@@ -61,6 +61,15 @@ namespace MovieCollection.Infrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Email not found.
+        /// </summary>
+        public static string EmailNotFound {
+            get {
+                return ResourceManager.GetString("EmailNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} can&apos;t be null.
         /// </summary>
         public static string PropertyCantBeNull {

@@ -30,26 +30,51 @@ namespace MovieCollection.Application.Features.AccessControl
             this.tokenSettings = tokenSettings;
         }
 
-        public async Task<AppResponse<UserLoginResponse>> UserLoginAsync(UserLoginRequest req)
+        public async Task<AppResponse<UserLoginResponse>> UserLoginAsync(UserLoginRequest request)
         {
-            throw new NotImplementedException();
+            var user = await userManager.FindByEmailAsync(request.Email);
+
+            if (user == null)
+                return AppResponse<UserLoginResponse>.Error(nameof(request.Email), ValidationMessages.EmailNotFound);
+            else
+            {
+                var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+                if (result.Succeeded)
+                {
+                    var token = await GenerateUserToken(user);
+                    return AppResponse<UserLoginResponse>.Success(token);
+                }
+                else
+                    return AppResponse<UserLoginResponse>.Error(nameof(request.Password), result.ToString());
+            }
         }
 
         public async Task<AppResponse> UserLogoutAsync(ClaimsPrincipal user)
         {
-            throw new NotImplementedException(); 
+            if (user.Identity?.IsAuthenticated ?? false)
+            {
+                var userId = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                if (userId == null)
+                    return AppResponse.Success();
+
+                var appUser = await this.userManager.FindByIdAsync(userId);
+                if (appUser != null) 
+                    await userManager.UpdateSecurityStampAsync(appUser);
+            }
+            return AppResponse.Success();
         }
 
-        public async Task<AppResponse<UserRefreshTokenResponse>> UserRefreshTokenAsync(UserRefreshTokenRequest req)
+        public async Task<AppResponse<UserRefreshTokenResponse>> UserRefreshTokenAsync(UserRefreshTokenRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<AppResponse> UserRegisterAsync(UserRegisterRequest req)
+        public async Task<AppResponse> UserRegisterAsync(UserRegisterRequest request)
         {
-            var user = req.FromDTO();
+            var user = request.FromDTO();
 
-            var result = await this.userManager.CreateAsync(user, req.Password);
+            var result = await this.userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
                 return AppResponse.Success();
