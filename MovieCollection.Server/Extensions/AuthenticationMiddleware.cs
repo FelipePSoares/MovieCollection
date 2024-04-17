@@ -18,6 +18,7 @@ namespace MovieCollection.Server.Extensions
 
             services.AddIdentityCore<User>()
                 .AddSignInManager()
+                .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<MovieCollectionDatabaseContext>()
                 .AddClaimsPrincipalFactory<CustomClaimsPrincipalFactory>()
                 .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
@@ -50,7 +51,7 @@ namespace MovieCollection.Server.Extensions
                 .AddJwtBearer(config =>
                 {
                     config.RequireHttpsMetadata = false;
-                    config.SaveToken = false;   
+                    config.SaveToken = false;
                     config.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,

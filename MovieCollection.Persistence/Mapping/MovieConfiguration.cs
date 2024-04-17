@@ -20,6 +20,9 @@ namespace MovieCollection.Persistence.Mapping
 
             builder.HasMany(p => p.Genres)
                 .WithMany();
+
+            builder.HasMany(p => p.Users)
+                .WithMany(u => u.MovieCollection);
         }
     }
 }

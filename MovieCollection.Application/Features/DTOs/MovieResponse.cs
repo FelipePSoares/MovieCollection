@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using MovieCollection.Domain.AccessControl;
+using MovieCollection.Domain;
 
-namespace MovieCollection.Domain
+namespace MovieCollection.Application.Features.DTOs
 {
-    public class Movie : BaseEntity
+    public class MovieResponse
     {
-        public Movie() { }
-
+        public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime ReleaseDate { get; set; }
         public TimeSpan Duration { get; set; }
-        public List<Genre> Genres { get; set; } = new List<Genre>();
-        public List<User> Users { get; set; } = new List<User>();
+        public List<GenreResponse> Genres { get; set; } = new List<GenreResponse>();
     }
 }

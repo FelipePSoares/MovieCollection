@@ -1,15 +1,17 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.IdentityModel.Tokens;
 using MovieCollection.Application.Features.AccessControl;
-using MovieCollection.Common.Tests.Fakers.AccessControl;
+using MovieCollection.Common.Tests;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure.Authentication;
 
 namespace MovieCollection.Application.Tests.Features.AccessControl
 {
-    public class TokenUtilTests
+    public class TokenUtilTests : BaseTests
     {
         private readonly JwtSecurityTokenHandler jwtHandler;
 
@@ -173,7 +175,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
         public static IEnumerable<object[]> TokenInfoData()
         {
-            var user = new UserFaker().Generate();
+            var user = Fixture.Create<User>();
 
             yield return new object[] { user, user.Id.ToString(), ClaimTypes.NameIdentifier };
             yield return new object[] { user, user.FirstName.ToString(), ClaimTypes.GivenName };

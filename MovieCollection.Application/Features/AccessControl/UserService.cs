@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MovieCollection.Application.Features.AccessControl.DTOs;
 using MovieCollection.Application.Features.AccessControl.Mappers;
 using MovieCollection.Domain.AccessControl;
@@ -17,15 +19,18 @@ namespace MovieCollection.Application.Features.AccessControl
         private readonly string tokenPurpose = "RefreshToken";
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
+        private readonly RoleManager<IdentityRole<Guid>> roleManager;
         private readonly TokenSettings tokenSettings;
 
         public UserService(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
+            RoleManager<IdentityRole<Guid>> roleManager,
             TokenSettings tokenSettings)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.roleManager = roleManager;
             this.tokenSettings = tokenSettings;
         }
 
@@ -56,7 +61,7 @@ namespace MovieCollection.Application.Features.AccessControl
 
                 var appUser = await this.userManager.FindByIdAsync(userId);
                 if (appUser != null)
-                    await userManager.UpdateSecurityStampAsync(appUser);
+                    await LogoutAsync(appUser);
             }
             return AppResponse.Success();
         }
@@ -80,16 +85,78 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserRefreshTokenResponse>.Success(token);
         }
 
-        public async Task<AppResponse> UserRegisterAsync(UserRegisterRequest request)
+        public async Task<AppResponse<UserProfileResponse>> UserRegisterAsync(UserRegisterRequest request)
         {
             var user = request.FromDTO();
 
             var result = await this.userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
-                return AppResponse.Success();
+                return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
             else
-                return AppResponse.Error(GetRegisterErrors(result));
+                return AppResponse<UserProfileResponse>.Error(GetRegisterErrors(result));
+        }
+
+        public async Task<AppResponse<UserProfileResponse>> GetUserByIdAsync(Guid id)
+        {
+            var user = await this.userManager.Users.Include(user => user.MovieCollection).FirstOrDefaultAsync(user => user.Id == id);
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+        }
+
+        public async Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto)
+        {
+            var userId = userLogged.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await this.userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
+            user.HasIncompletedInformation = false;
+
+            await this.userManager.UpdateAsync(user);
+            await this.LogoutAsync(user);
+
+            return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+        }
+
+        public async Task<AppResponse> RemoveUserAsync(ClaimsPrincipal user)
+        {
+            var userId = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return AppResponse.Success();
+
+            var appUser = await this.userManager.FindByIdAsync(userId);
+            if (appUser == null)
+                return AppResponse.Success();
+
+            await this.LogoutAsync(appUser);
+            var result = await this.userManager.DeleteAsync(appUser);
+
+            if (result.Succeeded)
+                return AppResponse.Success();
+
+            return AppResponse.Error(GetRegisterErrors(result));
+        }
+
+        public async Task<AppResponse> BlockUserAsync(Guid userId)
+        {
+            var user = await this.userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            var result = await this.userManager.SetLockoutEnabledAsync(user, true);
+
+            if (result.Succeeded)
+                return AppResponse.Success();
+
+            return AppResponse.Error(GetRegisterErrors(result));
         }
 
         private Dictionary<string, string> GetRegisterErrors(IdentityResult result)
@@ -123,9 +190,10 @@ namespace MovieCollection.Application.Features.AccessControl
 
         private async Task<(string AccessToken, string RefreshToken)> GenerateTokenAsync(User user)
         {
-            var claims = await this.userManager.GetClaimsAsync(user);
+            var userRoles = await this.userManager.GetRolesAsync(user);
+            var claims = userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)).ToList();
 
-            var token = TokenUtil.GetToken(tokenSettings, user, claims.ToList());
+            var token = TokenUtil.GetToken(tokenSettings, user, claims);
 
             await userManager.RemoveAuthenticationTokenAsync(user, this.tokenProvider, this.tokenPurpose);
             var refreshToken = await userManager.GenerateUserTokenAsync(user, this.tokenProvider, this.tokenPurpose);
@@ -133,5 +201,8 @@ namespace MovieCollection.Application.Features.AccessControl
 
             return (AccessToken: token, RefreshToken: refreshToken);
         }
+
+        private async Task<IdentityResult> LogoutAsync(User appUser) 
+            => await userManager.UpdateSecurityStampAsync(appUser);
     }
 }
