@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ namespace MovieCollection.Application.Features.AccessControl
     public class UserService : IUserService
     {
         private readonly string tokenProvider = "REFRESHTOKENPROVIDER";
-        private readonly string purpose = "RefreshToken";
+        private readonly string tokenPurpose = "RefreshToken";
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
         private readonly TokenSettings tokenSettings;
@@ -36,17 +35,14 @@ namespace MovieCollection.Application.Features.AccessControl
 
             if (user == null)
                 return AppResponse<UserLoginResponse>.Error(nameof(request.Email), ValidationMessages.EmailNotFound);
-            else
+
+            var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+            if (result.Succeeded)
             {
-                var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-                if (result.Succeeded)
-                {
-                    var token = await GenerateUserToken(user);
-                    return AppResponse<UserLoginResponse>.Success(token);
-                }
-                else
-                    return AppResponse<UserLoginResponse>.Error(nameof(request.Password), result.ToString());
+                var token = await GenerateUserToken(user);
+                return AppResponse<UserLoginResponse>.Success(token);
             }
+            return AppResponse<UserLoginResponse>.Error(nameof(request.Password), result.ToString());
         }
 
         public async Task<AppResponse> UserLogoutAsync(ClaimsPrincipal user)
@@ -59,7 +55,7 @@ namespace MovieCollection.Application.Features.AccessControl
                     return AppResponse.Success();
 
                 var appUser = await this.userManager.FindByIdAsync(userId);
-                if (appUser != null) 
+                if (appUser != null)
                     await userManager.UpdateSecurityStampAsync(appUser);
             }
             return AppResponse.Success();
@@ -67,7 +63,21 @@ namespace MovieCollection.Application.Features.AccessControl
 
         public async Task<AppResponse<UserRefreshTokenResponse>> UserRefreshTokenAsync(UserRefreshTokenRequest request)
         {
-            throw new NotImplementedException();
+            var principal = TokenUtil.GetPrincipalFromExpiredToken(this.tokenSettings, request.AccessToken);
+            if (principal == null || principal.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return AppResponse<UserRefreshTokenResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            var user = await this.userManager.FindByIdAsync(principal.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (user == null)
+                return AppResponse<UserRefreshTokenResponse>.Error("User", ValidationMessages.UserNotFound);
+
+            if (!await this.userManager.VerifyUserTokenAsync(user, this.tokenProvider, this.tokenPurpose, request.RefreshToken))
+                return AppResponse<UserRefreshTokenResponse>.Error(nameof(request.RefreshToken), ValidationMessages.RefreshTokenExpired);
+
+            var token = await GenerateRefreshToken(user);
+
+            return AppResponse<UserRefreshTokenResponse>.Success(token);
         }
 
         public async Task<AppResponse> UserRegisterAsync(UserRegisterRequest request)
@@ -91,7 +101,7 @@ namespace MovieCollection.Application.Features.AccessControl
                 if (!errorDictionary.ContainsKey(error.Code))
                 {
                     errorDictionary[error.Code] = error.Description;
-                }   
+                }
             }
 
             return errorDictionary;
@@ -99,14 +109,29 @@ namespace MovieCollection.Application.Features.AccessControl
 
         private async Task<UserLoginResponse> GenerateUserToken(User user)
         {
+            var result = await this.GenerateTokenAsync(user);
+
+            return new UserLoginResponse(result.AccessToken, result.RefreshToken);
+        }
+
+        private async Task<UserRefreshTokenResponse> GenerateRefreshToken(User user)
+        {
+            var result = await this.GenerateTokenAsync(user);
+
+            return new UserRefreshTokenResponse(result.AccessToken, result.RefreshToken);
+        }
+
+        private async Task<(string AccessToken, string RefreshToken)> GenerateTokenAsync(User user)
+        {
             var claims = await this.userManager.GetClaimsAsync(user);
-            
+
             var token = TokenUtil.GetToken(tokenSettings, user, claims.ToList());
 
-            await userManager.RemoveAuthenticationTokenAsync(user, this.tokenProvider, this.purpose);
-            var refreshToken = await userManager.GenerateUserTokenAsync(user, this.tokenProvider, this.purpose);
-            await userManager.SetAuthenticationTokenAsync(user, this.tokenProvider, this.purpose, refreshToken);
-            return new UserLoginResponse() { AccessToken = token, RefreshToken = refreshToken };
+            await userManager.RemoveAuthenticationTokenAsync(user, this.tokenProvider, this.tokenPurpose);
+            var refreshToken = await userManager.GenerateUserTokenAsync(user, this.tokenProvider, this.tokenPurpose);
+            await userManager.SetAuthenticationTokenAsync(user, this.tokenProvider, this.tokenPurpose, refreshToken);
+
+            return (AccessToken: token, RefreshToken: refreshToken);
         }
     }
 }

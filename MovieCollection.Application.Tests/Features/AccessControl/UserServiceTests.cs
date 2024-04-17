@@ -208,5 +208,88 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             this.userManagerMock.Verify(userManager => userManager.FindByIdAsync(It.IsAny<string>()), Times.Once);
             this.userManagerMock.Verify(userManager => userManager.UpdateSecurityStampAsync(It.IsAny<User>()), Times.Never);
         }
+
+        [Fact]
+        public async Task UserRefreshTokenAsync_SucceedRefreshToken_ShouldReturnIsSucceedTrue()
+        {
+            // Arrange
+            var token = GenerateToken(this.tokenSettings);
+            var userRefreshTokenRequest = new UserRefreshTokenRequest()
+            {
+                AccessToken = token,
+            };
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.VerifyUserTokenAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            this.userManagerMock.Setup(userManager => userManager.GetClaimsAsync(It.IsAny<User>()))
+                .ReturnsAsync(new List<Claim>());
+
+            // Act
+            var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
+
+            // Assert
+            response.IsSucceed.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task UserRefreshTokenAsync_UserNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var token = GenerateToken(this.tokenSettings);
+            var userRefreshTokenRequest = new UserRefreshTokenRequest()
+            {
+                AccessToken = token,
+            };
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()));
+
+            // Act
+            var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
+        }
+
+        [Fact]
+        public async Task UserRefreshTokenAsync_InvalidRefreshToken_ShouldReturnIsSucceedFalseAndErrorMessage()
+        {
+            // Arrange
+            var token = GenerateToken(this.tokenSettings);
+            var userRefreshTokenRequest = new UserRefreshTokenRequest()
+            {
+                AccessToken = token,
+            };
+
+
+            this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new User());
+
+            this.userManagerMock.Setup(userManager => userManager.VerifyUserTokenAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
+
+            // Act
+            var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
+
+            // Assert
+            response.IsSucceed.Should().BeFalse();
+            response.Messages.Should().Contain(nameof(userRefreshTokenRequest.RefreshToken), ValidationMessages.RefreshTokenExpired);
+        }
+
+        private string GenerateToken(TokenSettings tokenSettings)
+        {
+            var user = new User()
+            {
+                Id = Guid.NewGuid()
+            };
+            var roleClaims = new List<Claim>();
+
+            var token = TokenUtil.GetToken(tokenSettings, user, roleClaims);
+            return token;
+        }
     }
 }

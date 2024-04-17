@@ -86,5 +86,23 @@ namespace MovieCollection.Infrastructure {
                 return ResourceManager.GetString("PropertyCantBeNullOrEmpty", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh token expired.
+        /// </summary>
+        public static string RefreshTokenExpired {
+            get {
+                return ResourceManager.GetString("RefreshTokenExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User not found.
+        /// </summary>
+        public static string UserNotFound {
+            get {
+                return ResourceManager.GetString("UserNotFound", resourceCulture);
+            }
+        }
     }
 }

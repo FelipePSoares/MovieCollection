@@ -196,7 +196,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             return token;
         }
 
-        private TokenSettings GenerateTokenSettings(string secretKey = null)
+        private TokenSettings GenerateTokenSettings()
         {
             var audience = "http://localhost:8080";
             var issuer = "http://localhost:8080";
@@ -204,7 +204,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
             var tokenSettings = new TokenSettings
             {
-                SecretKey = secretKey ?? Guid.NewGuid().ToString(),
+                SecretKey = Guid.NewGuid().ToString(),
                 Audience = audience,
                 Issuer = issuer,
                 TokenExpireSeconds = tokenExpireSeconds
