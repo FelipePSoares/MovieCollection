@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
@@ -16,6 +17,8 @@ namespace MovieCollection.Server.Controllers
         private readonly IUserService userService = userService;
 
         [HttpPost("[action]")]
+        [ProducesResponseType(typeof(UserProfileResponse), 201)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [AllowAnonymous]
         public async Task<IActionResult> Register(UserRegisterRequest req)
         {
@@ -25,6 +28,8 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(typeof(UserLoginResponse), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserLoginRequest req)
         {
@@ -34,6 +39,8 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(typeof(UserRefreshTokenResponse), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken(UserRefreshTokenRequest req)
         {
@@ -43,6 +50,9 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> Logout()
         {
             var result = await userService.UserLogoutAsync(User);
@@ -51,6 +61,9 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpGet("[action]")]
+        [ProducesResponseType(typeof(UserProfileResponse), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> Profile()
         {
             var userId = User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
@@ -61,6 +74,9 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpGet("{userId}")]
+        [ProducesResponseType(typeof(UserProfileResponse), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> GetById(Guid userId)
         {
             var result = await userService.GetUserByIdAsync(userId);
@@ -69,9 +85,35 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpPut("[action]")]
-        public async Task<IActionResult> SetUserNameAsync(UserSetNameRequest userDto)
+        [ProducesResponseType(typeof(UserProfileResponse), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> SetUserName(UserSetNameRequest userDto)
         {
             var result = await userService.SetUserNameAsync(User, userDto);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> RemoveUser()
+        {
+            var result = await userService.RemoveUserAsync(User);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpDelete("{userId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Block(Guid userId)
+        {
+            var result = await userService.BlockUserAsync(userId);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

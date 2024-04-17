@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using MovieCollection.Persistence;
 using MovieCollection.Application.Features;
+using MovieCollection.Domain.AccessControl;
+using MovieCollection.Infrastructure.Authentication;
+using MovieCollection.Persistence;
 using MovieCollection.Server.Extensions;
 using Newtonsoft.Json.Converters;
-using MovieCollection.Infrastructure.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +48,26 @@ else
 {
     app.UseMigration();
     app.MapHealthChecks("/healthcheck/readness");
+}
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var adminRole = new IdentityRole<Guid>("Administrator");
+    roleManager.CreateAsync(adminRole).GetAwaiter().GetResult();
+
+    var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+    var admin = new User()
+    {
+        UserName = "Admin",
+        Email = "admin@admin.com",
+        FirstName = "Admin",
+        LastName = "Admin",
+        HasIncompletedInformation = false
+    };
+    userManager.CreateAsync(admin, "Admin@123456").GetAwaiter().GetResult();
+    userManager.AddToRoleAsync(admin, "Administrator").GetAwaiter().GetResult();
 }
 
 app.UseAuthorization();
