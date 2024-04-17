@@ -15,7 +15,7 @@ namespace MovieCollection.Application.Features.AccessControl.Mappers
                 LastName = user.LastName,
                 MovieCollection = user.MovieCollection.ToMovieResponse(),
                 Enabled = user.Enabled,
-                IsFirstLogin = user.IsFirstLogin
+                HasIncompletedInformation = user.HasIncompletedInformation
             };
         }
     }

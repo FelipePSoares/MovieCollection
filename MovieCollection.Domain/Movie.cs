@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MovieCollection.Domain.AccessControl;
 
 namespace MovieCollection.Domain
 {
@@ -12,5 +13,6 @@ namespace MovieCollection.Domain
         public DateTime ReleaseDate { get; set; }
         public TimeSpan Duration { get; set; }
         public List<Genre> Genres { get; set; } = new List<Genre>();
+        public List<User> Users { get; set; } = new List<User>();
     }
 }

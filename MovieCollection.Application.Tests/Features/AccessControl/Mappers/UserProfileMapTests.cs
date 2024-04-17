@@ -22,7 +22,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl.Mappers
             userProfile.FirstName.Should().Be(user.FirstName);
             userProfile.LastName.Should().Be(user.LastName);
             userProfile.Enabled.Should().Be(user.Enabled);
-            userProfile.IsFirstLogin.Should().Be(user.IsFirstLogin);
+            userProfile.HasIncompletedInformation.Should().Be(user.HasIncompletedInformation);
             userProfile.MovieCollection.Should().HaveCount(user.MovieCollection.Count);
         }
     }

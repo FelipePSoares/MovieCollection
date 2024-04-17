@@ -13,7 +13,6 @@ namespace MovieCollection.Persistence
         {
             modelBuilder.ApplyConfiguration(new GenreConfiguration());
             modelBuilder.ApplyConfiguration(new MovieConfiguration());
-            modelBuilder.ApplyConfiguration(new UserMovieConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

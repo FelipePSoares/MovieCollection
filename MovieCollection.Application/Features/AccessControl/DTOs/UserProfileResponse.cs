@@ -10,7 +10,7 @@ namespace MovieCollection.Application.Features.AccessControl.DTOs
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public bool Enabled { get; set; }
-        public bool IsFirstLogin { get; set; }
+        public bool HasIncompletedInformation { get; set; }
         public List<MovieResponse> MovieCollection { get; set; } = new List<MovieResponse>();
     }
 }
