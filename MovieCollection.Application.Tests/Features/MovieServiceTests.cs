@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.JsonPatch;
+using MockQueryable.Moq;
 using Moq;
 using MovieCollection.Application.Contracts.Persistence;
 using MovieCollection.Application.Features;
@@ -12,12 +13,22 @@ using MovieCollection.Domain;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.DTOs;
 
+
 namespace MovieCollection.Application.Tests.Features
 {
     public class MovieServiceTests : BaseTests
     {
         private readonly IMovieService movieService = default!;
         private readonly Mock<IGenericRepository<Movie>> movieRepositoryMock = default!;
+
+        public MovieServiceTests()
+        {
+            var unitOfWork = new Mock<IUnitOfWork>();
+            this.movieRepositoryMock = new Mock<IGenericRepository<Movie>>();
+            unitOfWork.Setup(uw => uw.MovieRepository).Returns(this.movieRepositoryMock.Object);
+
+            this.movieService = new MovieService(unitOfWork.Object);
+        }
 
         [Fact]
         public async Task GetByIdAsync_MovieFound_ShoundReturnSucceededTrueAndMovieData()
@@ -26,7 +37,7 @@ namespace MovieCollection.Application.Tests.Features
             var movie = Fixture.Create<Movie>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(new List<Movie>() { movie }.AsQueryable());
+                .Returns(new List<Movie>() { movie }.BuildMock());
 
             // Act
             var response = await this.movieService.GetByIdAsync(movie.Id);
@@ -34,7 +45,15 @@ namespace MovieCollection.Application.Tests.Features
             // Assert
             response.Should().NotBeNull();
             response.Succeeded.Should().BeTrue();
-            response.Data.Should().BeEquivalentTo(movie);
+            response.Data.Should().BeEquivalentTo(movie, config 
+                => config
+                .Excluding(movie => movie.Users)
+                .Excluding(movie => movie.CreatedDate)
+                .Excluding(movie => movie.ModifiedAt)
+                .For(movie => movie.Genres)
+                    .Exclude(genre => genre.CreatedDate)
+                .For(movie => movie.Genres)
+                    .Exclude(genre => genre.ModifiedAt));
         }
 
         [Fact]
@@ -42,7 +61,7 @@ namespace MovieCollection.Application.Tests.Features
         {
             // Arrange
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(new List<Movie>() { }.AsQueryable());
+                .Returns(new List<Movie>() { }.BuildMock());
 
             // Act
             var response = await this.movieService.GetByIdAsync(Guid.NewGuid());
@@ -60,7 +79,7 @@ namespace MovieCollection.Application.Tests.Features
             var movies = Fixture.Create<List<Movie>>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(movies.AsQueryable());
+                .Returns(movies.BuildMock());
 
             // Act
             var response = await this.movieService.SearchAsync(new MovieFilters());
@@ -76,7 +95,7 @@ namespace MovieCollection.Application.Tests.Features
         {
             // Arrange
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(new List<Movie>().AsQueryable());
+                .Returns(new List<Movie>().BuildMock());
 
             // Act
             var response = await this.movieService.SearchAsync(new MovieFilters());
@@ -128,7 +147,7 @@ namespace MovieCollection.Application.Tests.Features
             var movie = Fixture.Create<Movie>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Trackable())
-                .Returns(new List<Movie>() { new() }.AsQueryable());
+                .Returns(new List<Movie>() { new() }.BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Delete(It.IsAny<Movie>()))
                 .Returns(AppResponse.Success);
@@ -149,7 +168,7 @@ namespace MovieCollection.Application.Tests.Features
             var movie = Fixture.Create<Movie>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Trackable())
-                .Returns(new List<Movie>() { new() }.AsQueryable());
+                .Returns(new List<Movie>() { new() }.BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Delete(It.IsAny<Movie>()))
                 .Returns(AppResponse.Error("code", "description"));
@@ -190,7 +209,7 @@ namespace MovieCollection.Application.Tests.Features
             jsonPatch.Add(t => t.Title, "Test Title");
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(new List<Movie>() { movie }.AsQueryable());
+                .Returns(new List<Movie>() { movie }.BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
                 .Returns(AppResponse<Movie>.Success(movie));
@@ -211,7 +230,7 @@ namespace MovieCollection.Application.Tests.Features
             var jsonPatch = new JsonPatchDocument<MovieRegisterRequest>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(new List<Movie>() { }.AsQueryable());
+                .Returns(new List<Movie>() { }.BuildMock());
 
             // Act
             var response = await this.movieService.UpdateAsync(Guid.NewGuid(), jsonPatch);
