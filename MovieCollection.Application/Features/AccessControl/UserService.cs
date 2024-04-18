@@ -10,6 +10,7 @@ using MovieCollection.Application.Features.AccessControl.Mappers;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.Authentication;
+using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Application.Features.AccessControl
 {
@@ -168,20 +169,8 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse.Error(GetRegisterErrors(result));
         }
 
-        private Dictionary<string, string> GetRegisterErrors(IdentityResult result)
-        {
-            var errorDictionary = new Dictionary<string, string>(1);
-
-            foreach (var error in result.Errors)
-            {
-                if (!errorDictionary.ContainsKey(error.Code))
-                {
-                    errorDictionary[error.Code] = error.Description;
-                }
-            }
-
-            return errorDictionary;
-        }
+        private static List<AppMessage> GetRegisterErrors(IdentityResult result) 
+            => result.Errors.Select(error => new AppMessage(error.Code, error.Description)).ToList();
 
         private async Task<UserLoginResponse> GenerateUserToken(User user)
         {

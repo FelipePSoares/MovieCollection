@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features;
 using MovieCollection.Application.Features.DTOs;
-using MovieCollection.Infrastructure;
+using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Server.Controllers
 {

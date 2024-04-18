@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MovieCollection.Application.Contracts.Persistence;
 using MovieCollection.Domain;
 
@@ -8,13 +9,17 @@ namespace MovieCollection.Persistence.Repositories
     {
         private bool disposed = false;
         private readonly MovieCollectionDatabaseContext context;
+        private readonly Lazy<IGenericRepository<Movie>> movieRepository;
 
-        public UnitOfWork(MovieCollectionDatabaseContext dbContext)
+        public UnitOfWork(MovieCollectionDatabaseContext dbContext, ILogger logger)
         {
             this.context = dbContext;
+            this.movieRepository = new Lazy<IGenericRepository<Movie>>(() => new GenericRepository<Movie>(this.context, logger));
         }
 
-        public async Task CommitAsync()
+        public IGenericRepository<Movie> MovieRepository => this.movieRepository.Value;
+
+        public Task CommitAsync()
         {
             var currentDateTime = DateTime.Now;
             var entries = this.context.ChangeTracker.Entries();
@@ -41,7 +46,7 @@ namespace MovieCollection.Persistence.Repositories
                 ((BaseEntity)e.Entity).ModifiedAt = currentDateTime;
             });
 
-            await this.context.SaveChangesAsync();
+            return this.context.SaveChangesAsync();
         }
 
         protected virtual void Dispose(bool disposing)

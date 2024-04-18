@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MovieCollection.Application.Features.AccessControl.DTOs;
-using MovieCollection.Infrastructure;
+using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Application.Features.AccessControl
 {

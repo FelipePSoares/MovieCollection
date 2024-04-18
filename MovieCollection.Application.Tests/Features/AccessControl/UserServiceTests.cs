@@ -10,6 +10,7 @@ using MovieCollection.Common.Tests;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.Authentication;
+using MovieCollection.Common.Tests.Extensions;
 
 namespace MovieCollection.Application.Tests.Features.AccessControl
 {
@@ -19,25 +20,23 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         private readonly Mock<SignInManager<User>> signInManagerMock;
         private readonly Mock<RoleManager<IdentityRole<Guid>>> roleManagerMock;
         private readonly TokenSettings tokenSettings;
-        private readonly UserService userService;
+        private readonly IUserService userService;
 
         public UserServiceTests()
         {
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             var store = new Mock<IUserStore<User>>();
-            this.userManagerMock = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
+            this.userManagerMock = new Mock<UserManager<User>>(store.Object, default!, default!, default!, default!, default!, default!, default!, default!);
             var contextAccessorMock = new Mock<IHttpContextAccessor>();
             var claimsFactoryMock = new Mock<IUserClaimsPrincipalFactory<User>>();
-            this.signInManagerMock = new Mock<SignInManager<User>>(this.userManagerMock.Object, contextAccessorMock.Object, claimsFactoryMock.Object, null, null, null);
+            this.signInManagerMock = new Mock<SignInManager<User>>(this.userManagerMock.Object, contextAccessorMock.Object, claimsFactoryMock.Object, default!, default!, default!);
             var roleStore = new Mock<IRoleStore<IdentityRole<Guid>>>();
-            this.roleManagerMock = new Mock<RoleManager<IdentityRole<Guid>>>(roleStore.Object, null, null, null, null);
+            this.roleManagerMock = new Mock<RoleManager<IdentityRole<Guid>>>(roleStore.Object, default!, default!, default!, default!);
             this.tokenSettings = new TokenSettings()
             {
                 SecretKey = Guid.NewGuid().ToString()
             };
 
             this.userService = new UserService(this.userManagerMock.Object, this.signInManagerMock.Object, this.roleManagerMock.Object, this.tokenSettings);
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Fact]
@@ -53,7 +52,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserRegisterAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
             response.Data.Should().NotBeNull();
         }
@@ -83,7 +82,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserRegisterAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain(error.Code, error.Description);
             response.Messages.Should().Contain(error2.Code, error2.Description);
         }
@@ -114,7 +113,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLoginAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
             response.Data.Should().NotBeNull();
             response.Data.AccessToken.Should().NotBeNull();
@@ -138,7 +137,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLoginAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().ContainKey("Blocked");
         }
 
@@ -152,7 +151,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLoginAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain("Email", ValidationMessages.EmailNotFound);
         }
 
@@ -172,7 +171,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLoginAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain("Password", "Failed");
         }
 
@@ -186,7 +185,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLogoutAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
         }
 
@@ -210,7 +209,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLogoutAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
             this.userManagerMock.Verify(userManager => userManager.FindByIdAsync(It.IsAny<string>()), Times.Once);
             this.userManagerMock.Verify(userManager => userManager.UpdateSecurityStampAsync(It.IsAny<User>()), Times.Once);
@@ -235,7 +234,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserLogoutAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
             this.userManagerMock.Verify(userManager => userManager.FindByIdAsync(It.IsAny<string>()), Times.Once);
             this.userManagerMock.Verify(userManager => userManager.UpdateSecurityStampAsync(It.IsAny<User>()), Times.Never);
@@ -267,7 +266,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
         }
 
         [Fact]
@@ -290,7 +289,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().ContainKey("Blocked");
         }
 
@@ -310,7 +309,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain(MessageKey.NotFound, ValidationMessages.UserNotFound);
         }
 
@@ -335,7 +334,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.UserRefreshTokenAsync(userRefreshTokenRequest);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain(nameof(userRefreshTokenRequest.RefreshToken), ValidationMessages.RefreshTokenExpired);
         }
 
@@ -360,7 +359,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.SetUserNameAsync(user, userDto);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
             expectedUser.FirstName.Should().Be(userDto.FirstName);
             expectedUser.LastName.Should().Be(userDto.LastName);
@@ -380,7 +379,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.SetUserNameAsync(user, userDto);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain(MessageKey.NotFound, ValidationMessages.UserNotFound);
         }
 
@@ -403,7 +402,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.RemoveUserAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
         }
 
@@ -430,7 +429,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.RemoveUserAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain("code", "description");
         }
 
@@ -449,7 +448,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.RemoveUserAsync(user);
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             this.userManagerMock.Verify(userManager => userManager.DeleteAsync(It.IsAny<User>()), Times.Never);
         }
 
@@ -467,7 +466,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.BlockUserAsync(Guid.NewGuid());
 
             // Assert
-            response.IsSucceed.Should().BeTrue();
+            response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
         }
 
@@ -479,7 +478,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.BlockUserAsync(Guid.NewGuid());
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain(MessageKey.NotFound, ValidationMessages.UserNotFound);
         }
 
@@ -501,7 +500,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var response = await this.userService.BlockUserAsync(Guid.NewGuid());
 
             // Assert
-            response.IsSucceed.Should().BeFalse();
+            response.Succeeded.Should().BeFalse();
             response.Messages.Should().Contain("code", "description");
         }
 

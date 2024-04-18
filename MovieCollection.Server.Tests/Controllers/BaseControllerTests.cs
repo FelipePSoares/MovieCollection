@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using MovieCollection.Infrastructure;
+using MovieCollection.Infrastructure.DTOs;
 using MovieCollection.Server.Controllers;
+using MovieCollection.Common.Tests.Extensions;
 
 namespace MovieCollection.Server.Tests.Controllers
 {
@@ -36,7 +37,7 @@ namespace MovieCollection.Server.Tests.Controllers
 
             // Assert
             result.Should().BeAssignableTo<BadRequestObjectResult>()
-                .Which.Value.Should().BeAssignableTo<Dictionary<string, string>>()
+                .Which.Value.Should().BeAssignableTo<List<AppMessage>>()
                 .Which.Should().Contain("teste", "teste");
         }
 
@@ -88,10 +89,9 @@ namespace MovieCollection.Server.Tests.Controllers
 
             // Assert
             result.Should().BeAssignableTo<BadRequestObjectResult>()
-                .Which.Value.Should().BeAssignableTo<Dictionary<string, string>>()
+                .Which.Value.Should().BeAssignableTo<List<AppMessage>>()
                 .Which.Should().Contain("teste", "teste");
         }
-
 
         [Theory]
         [InlineData("NotFound", typeof(NotFoundResult))]
