@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MovieCollection.Application.Features;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure.Authentication;
+using MovieCollection.Infrastructure.Middleware;
 using MovieCollection.Persistence;
 using MovieCollection.Server.Extensions;
 using Newtonsoft.Json.Converters;
@@ -45,6 +47,11 @@ app.UseStaticFiles();
 
 //Add support to logging request with SERILOG
 app.UseSerilogRequestLogging();
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    app.UseCustomExceptionHandler(serviceScope.ServiceProvider.GetRequiredService<ILogger<ExceptionMiddleware>>());
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
