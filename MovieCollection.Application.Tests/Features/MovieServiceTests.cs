@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Security.Claims;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.JsonPatch;
 using MockQueryable.Moq;
@@ -10,6 +11,7 @@ using MovieCollection.Application.Features.Mappers;
 using MovieCollection.Common.Tests;
 using MovieCollection.Common.Tests.Extensions;
 using MovieCollection.Domain;
+using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.DTOs;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -73,22 +75,21 @@ namespace MovieCollection.Application.Tests.Features
             response.Messages.Should().ContainKey(MessageKey.NotFound);
         }
 
-        [Fact]
-        public async Task SearchAsync_MovieFound_ShoundReturnSucceededTrueAndMovieData()
+        [Theory]
+        [MemberData(nameof(SearchData))]
+        public async Task SearchAsync_MovieFound_ShoundReturnSucceededTrueAndMovieData(MovieFilters filter, List<Movie> moviesDb, List<MovieResponse> resultExpected)
         {
             // Arrange
-            var movies = Fixture.Create<List<Movie>>();
-
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(movies.BuildMock());
+                .Returns(moviesDb.BuildMock());
 
             // Act
-            var response = await this.movieService.SearchAsync(new MovieFilters());
+            var response = await this.movieService.SearchAsync(filter);
 
             // Assert
             response.Should().NotBeNull();
             response.Succeeded.Should().BeTrue();
-            response.Data.Should().BeEquivalentTo(movies);
+            response.Data.Should().BeEquivalentTo(resultExpected);
         }
 
         [Fact]
@@ -242,5 +243,52 @@ namespace MovieCollection.Application.Tests.Features
             response.Messages.Should().ContainKey(MessageKey.NotFound);
         }
 
+        public static IEnumerable<object[]> SearchData()
+        {
+            var movies = Fixture.Create<List<Movie>>();
+
+            movies[0].ReleaseYear = DateTime.UtcNow.AddYears(-1).Year;
+            movies[1].ReleaseYear = DateTime.UtcNow.Year;
+            movies[2].ReleaseYear = DateTime.UtcNow.AddYears(1).Year;
+
+            var filter = new MovieFilters()
+            {
+                Title = movies[1].Title
+            };
+            yield return new object[] { filter, movies, new List<MovieResponse>() { movies[1].ToMovieResponse() } };
+
+            filter = new MovieFilters()
+            {
+                Title = string.Concat(movies[1].Title.Skip(5).Take(5))
+            };
+            yield return new object[] { filter, movies, new List<MovieResponse>() { movies[1].ToMovieResponse() } };
+
+            filter = new MovieFilters()
+            {
+                Genres = new List<Guid>() { movies[0].Genres.First().Id, movies[2].Genres.Last().Id }
+            };
+            yield return new object[] { filter, movies, new List<MovieResponse>() { movies[0].ToMovieResponse(), movies[2].ToMovieResponse() } };
+
+            filter = new MovieFilters()
+            {
+                ReleaseYearStart = DateTime.UtcNow.Year,
+                ReleaseYearEnd = DateTime.UtcNow.Year,
+            };
+            yield return new object[] { filter, movies, new List<MovieResponse>() { movies[1].ToMovieResponse() } };
+
+            filter = new MovieFilters()
+            {
+                ReleaseYearStart = DateTime.UtcNow.AddYears(-1).Year,
+                ReleaseYearEnd = DateTime.UtcNow.AddYears(1).Year,
+            };
+            yield return new object[] { filter, movies, movies.ToMovieResponse() };
+
+            filter = new MovieFilters()
+            {
+                ReleaseYearStart = DateTime.UtcNow.AddYears(-1).Year,
+                ReleaseYearEnd = DateTime.UtcNow.Year,
+            };
+            yield return new object[] { filter, movies, new List<MovieResponse>() { movies[0].ToMovieResponse(), movies[1].ToMovieResponse() } };
+        }
     }
 }

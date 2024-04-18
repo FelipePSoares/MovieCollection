@@ -19,7 +19,7 @@ namespace MovieCollection.Application.Features.Mappers
                 Id = movie.Id,
                 Title = movie.Title,
                 Description = movie.Description,
-                ReleaseDate = movie.ReleaseDate,
+                ReleaseYear = movie.ReleaseYear,
                 Duration = movie.Duration,
                 Genres = movie.Genres.ToGenreResponse()
             };
@@ -31,7 +31,7 @@ namespace MovieCollection.Application.Features.Mappers
             {
                 Title = movieRegister.Title,
                 Description = movieRegister.Description,
-                ReleaseDate = movieRegister.ReleaseDate,
+                ReleaseYear = movieRegister.ReleaseYear,
                 Duration = movieRegister.Duration
             };
         }

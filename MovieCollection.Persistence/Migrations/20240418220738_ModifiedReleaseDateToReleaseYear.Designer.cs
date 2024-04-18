@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieCollection.Persistence;
 
@@ -11,9 +12,11 @@ using MovieCollection.Persistence;
 namespace MovieCollection.Persistence.Migrations
 {
     [DbContext(typeof(MovieCollectionDatabaseContext))]
-    partial class MovieCollectionDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240418220738_ModifiedReleaseDateToReleaseYear")]
+    partial class ModifiedReleaseDateToReleaseYear
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

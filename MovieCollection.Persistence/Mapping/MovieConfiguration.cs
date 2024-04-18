@@ -15,7 +15,7 @@ namespace MovieCollection.Persistence.Mapping
                 .IsRequired();
 
             builder.Property(p => p.Description);
-            builder.Property(p => p.ReleaseDate);
+            builder.Property(p => p.ReleaseYear);
             builder.Property(p => p.Duration);
 
             builder.HasMany(p => p.Genres)

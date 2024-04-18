@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
@@ -62,10 +65,17 @@ namespace MovieCollection.Application.Features
 
             return result;
         }
-
-        public Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter)
+        
+        public async Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter)
         {
-            throw new NotImplementedException();
+            var movies = await unitOfWork.MovieRepository
+                .NoTrackable()
+                .Where(movie => string.IsNullOrEmpty(filter.Title) ? true : movie.Title.Contains(filter.Title, StringComparison.InvariantCultureIgnoreCase))
+                .Where(movie => !filter.Genres.Any() ? true : movie.Genres.Any(genre => filter.Genres.Contains(genre.Id)))
+                .Where(movie => !filter.ReleaseYearStart.HasValue && !filter.ReleaseYearEnd.HasValue ? true : filter.ReleaseYearStart <= movie.ReleaseYear && movie.ReleaseYear <= filter.ReleaseYearEnd)
+                .ToListAsync();
+
+            return AppResponse<List<MovieResponse>>.Success(movies.ToMovieResponse());
         }
 
         public Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieRegisterRequest> movieDto)

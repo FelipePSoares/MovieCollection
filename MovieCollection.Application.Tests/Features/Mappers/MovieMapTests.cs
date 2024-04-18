@@ -21,7 +21,7 @@ namespace MovieCollection.Application.Tests.Features.Mappers
             movieResponse.Id.Should().Be(movie.Id);
             movieResponse.Title.Should().Be(movie.Title);
             movieResponse.Description.Should().Be(movie.Description);
-            movieResponse.ReleaseDate.Should().Be(movie.ReleaseDate);
+            movieResponse.ReleaseYear.Should().Be(movie.ReleaseYear);
             movieResponse.Duration.Should().Be(movie.Duration);
             movieResponse.Genres.Should().HaveCount(movie.Genres.Count);
         }
