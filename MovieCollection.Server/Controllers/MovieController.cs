@@ -51,7 +51,7 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(typeof(MovieResponse), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> Update(Guid movieId, [FromBody] JsonPatchDocument<MovieRegisterRequest> movieDto)
+        public async Task<IActionResult> Update(Guid movieId, [FromBody] JsonPatchDocument<MovieUpdateRequest> movieDto)
         {
             var result = await this.movieService.UpdateAsync(movieId, movieDto);
 

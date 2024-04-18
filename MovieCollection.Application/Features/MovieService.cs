@@ -78,9 +78,33 @@ namespace MovieCollection.Application.Features
             return AppResponse<List<MovieResponse>>.Success(movies.ToMovieResponse());
         }
 
-        public Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieRegisterRequest> movieDto)
+        public async Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieUpdateRequest> movieDto)
         {
-            throw new NotImplementedException();
+            var movie = await unitOfWork.MovieRepository.NoTrackable().Include(movie => movie.Genres).FirstOrDefaultAsync(movie => movie.Id == movieId);
+
+            if (movie == null)
+                return AppResponse<MovieResponse>.Error(MessageKey.NotFound, ValidationMessages.MovieNotFound);
+
+            var movieRequest = movie.ToMovieUpdate();
+
+            movieDto.ApplyTo(movieRequest);
+            movie = movieRequest.FromDTO();
+            movie.Id = movieId;
+
+            var validationResult = movie.IsValid();
+
+            if (!validationResult.Succeeded)
+                return AppResponse<MovieResponse>.Error(validationResult.Messages);
+
+            var result = unitOfWork.MovieRepository.InsertOrUpdate(movie);
+
+            if (result.Succeeded)
+            {
+                await unitOfWork.CommitAsync();
+                return AppResponse<MovieResponse>.Success(movie.ToMovieResponse());
+            }
+
+            return AppResponse<MovieResponse>.Error(result.Messages);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MovieCollection.Application.Features
         Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter);
         Task<AppResponse<MovieResponse>> GetByIdAsync(Guid movieId);
         Task<AppResponse<MovieResponse>> RegisterAsync(MovieRegisterRequest req);
-        Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieRegisterRequest> movieDto);
+        Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieUpdateRequest> movieDto);
         Task<AppResponse> RemoveAsync(Guid movieId);
     }
 }

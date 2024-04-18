@@ -31,7 +31,7 @@ namespace MovieCollection.Persistence.Repositories
 
             updatedEntries.ForEach(e =>
             {
-
+                e.Property("CreatedDate").IsModified = false;
                 ((BaseEntity)e.Entity).ModifiedAt = currentDateTime;
             });
 

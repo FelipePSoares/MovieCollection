@@ -204,35 +204,95 @@ namespace MovieCollection.Application.Tests.Features
         public async Task UpdateAsync_SucessUpdate_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var movieRequest = Fixture.Create<MovieRegisterRequest>();
-            var movie = movieRequest.FromDTO();
+            Movie movieUpdated = default!;
+            var movie = Fixture.Create<Movie>();
 
-            var jsonPatch = new JsonPatchDocument<MovieRegisterRequest>();
-            jsonPatch.Add(t => t.Title, "Test Title");
+            var expected = new Movie()
+            {
+                Id = movie.Id,
+                Title = "Test Title",
+                Description = "Test Description",
+                ReleaseYear = 2022,
+                Duration = new TimeSpan(2, 10, 0),
+                Genres = new List<Genre>()
+                {
+                    movie.Genres[0],
+                    movie.Genres[2],
+                    new Genre()
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Genre"
+                    }
+                }
+            };
+
+            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            jsonPatch.Replace(t => t.Title, expected.Title);
+            jsonPatch.Replace(t => t.Description, expected.Description);
+            jsonPatch.Replace(t => t.ReleaseYear, expected.ReleaseYear);
+            jsonPatch.Replace(t => t.Duration, expected.Duration);
+            jsonPatch.Remove(t => t.Genres, 1);
+            jsonPatch.Add(t => t.Genres, expected.Genres.Last().ToGenreUpdate());
+
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
                 .Returns(new List<Movie>() { movie }.BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
+                .Callback((Movie m) => movieUpdated = m)
                 .Returns(AppResponse<Movie>.Success(movie));
 
             // Act
-            var response = await this.movieService.UpdateAsync(Guid.NewGuid(), jsonPatch);
+            var response = await this.movieService.UpdateAsync(movie.Id, jsonPatch);
 
             // Assert
             response.Succeeded.Should().BeTrue();
             response.Messages.Should().BeEmpty();
             response.Data.Should().NotBeNull();
+            movieUpdated.Should().BeEquivalentTo(expected, config
+                => config
+                .Excluding(movie => movie.Users)
+                .Excluding(movie => movie.CreatedDate)
+                .Excluding(movie => movie.ModifiedAt)
+                .For(movie => movie.Genres)
+                    .Exclude(genre => genre.CreatedDate)
+                .For(movie => movie.Genres)
+                    .Exclude(genre => genre.ModifiedAt));
+        }
+
+        [Fact]
+        public async Task UpdateAsync_InvalidMovie_ShouldReturnSucceededFalseAndErrorMessage()
+        {
+            // Arrange
+            var movie = Fixture.Create<Movie>();
+
+            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            jsonPatch.Replace(t => t.Title, string.Empty);
+
+            this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
+                .Returns(new List<Movie>() { movie }.BuildMock());
+
+            this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
+                .Verifiable();
+
+            // Act
+            var response = await this.movieService.UpdateAsync(movie.Id, jsonPatch);
+
+            // Assert
+            response.Succeeded.Should().BeFalse();
+            response.Data.Should().BeNull();
+            response.Messages.Should().Contain("Title", string.Format(ValidationMessages.PropertyCantBeNullOrEmpty, "Title"));
+            this.movieRepositoryMock.Verify(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()), Times.Never);
         }
 
         [Fact]
         public async Task UpdateAsync_MovieNotExist_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var jsonPatch = new JsonPatchDocument<MovieRegisterRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
-                .Returns(new List<Movie>() { }.BuildMock());
+                .Returns(new List<Movie>().BuildMock());
 
             // Act
             var response = await this.movieService.UpdateAsync(Guid.NewGuid(), jsonPatch);

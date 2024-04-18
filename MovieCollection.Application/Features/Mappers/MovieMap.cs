@@ -35,5 +35,29 @@ namespace MovieCollection.Application.Features.Mappers
                 Duration = movieRegister.Duration
             };
         }
+
+        public static MovieUpdateRequest ToMovieUpdate(this Movie movie)
+        {
+            return new MovieUpdateRequest
+            {
+                Title = movie.Title,
+                Description = movie.Description,
+                ReleaseYear = movie.ReleaseYear,
+                Duration = movie.Duration,
+                Genres = movie.Genres.ToGenreUpdate(),
+            };
+        }
+
+        public static Movie FromDTO(this MovieUpdateRequest movieRequest)
+        {
+            return new Movie()
+            {
+                Title = movieRequest.Title,
+                Description = movieRequest.Description,
+                ReleaseYear = movieRequest.ReleaseYear,
+                Duration = movieRequest.Duration,
+                Genres = movieRequest.Genres.FromDTO()
+            };
+        }
     }
 }
