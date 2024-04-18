@@ -24,5 +24,16 @@ namespace MovieCollection.Application.Features.Mappers
                 Genres = movie.Genres.ToGenreResponse()
             };
         }
+
+        public static Movie FromDTO(this MovieRegisterRequest movieRegister)
+        {
+            return new Movie()
+            {
+                Title = movieRegister.Title,
+                Description = movieRegister.Description,
+                ReleaseDate = movieRegister.ReleaseDate,
+                Duration = movieRegister.Duration
+            };
+        }
     }
 }

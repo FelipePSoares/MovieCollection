@@ -40,7 +40,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserRegisterAsync_SucessRegistration_ShouldReturnIsSucceedTrue()
+        public async Task UserRegisterAsync_SucessRegistration_ShouldReturnSucceededTrue()
         {
             // Arrange
             var user = new UserRegisterRequest();
@@ -58,7 +58,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserRegisterAsync_FailedRegistration_ShouldReturnIsSucceedFalseAndTheMessage()
+        public async Task UserRegisterAsync_FailedRegistration_ShouldReturnSucceededFalseAndTheMessage()
         {
             // Arrange
             var user = new UserRegisterRequest();
@@ -88,7 +88,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLoginAsync_RightInformation_ShouldReturnIsSucceedTrueAndToken()
+        public async Task UserLoginAsync_RightInformation_ShouldReturnSucceededTrueAndToken()
         {
             // Arrange
             var refreshToken = Guid.NewGuid().ToString();
@@ -121,7 +121,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLoginAsync_UserBlocked_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task UserLoginAsync_UserBlocked_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var refreshToken = Guid.NewGuid().ToString();
@@ -142,7 +142,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLoginAsync_EmailNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task UserLoginAsync_EmailNotExist_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var user = new UserLoginRequest();
@@ -156,7 +156,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLoginAsync_WrongPassword_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task UserLoginAsync_WrongPassword_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var user = new UserLoginRequest();
@@ -176,7 +176,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLogoutAsync_AlreadyLogout_ShouldReturnIsSucceedTrue()
+        public async Task UserLogoutAsync_AlreadyLogout_ShouldReturnSucceededTrue()
         {
             // Arrange
             var user = new ClaimsPrincipal();
@@ -190,7 +190,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLogoutAsync_SucceedLogout_ShouldReturnIsSucceedTrue()
+        public async Task UserLogoutAsync_SucceedLogout_ShouldReturnSucceededTrue()
         {
             // Arrange
             var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -216,7 +216,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserLogoutAsync_LogoutWithError_ShouldReturnIsSucceedTrue()
+        public async Task UserLogoutAsync_LogoutWithError_ShouldReturnSucceededTrue()
         {
             // Arrange
             var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -241,7 +241,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserRefreshTokenAsync_SucceedRefreshToken_ShouldReturnIsSucceedTrue()
+        public async Task UserRefreshTokenAsync_SucceedRefreshToken_ShouldReturnSucceededTrue()
         {
             // Arrange
             var token = GenerateToken(this.tokenSettings);
@@ -270,7 +270,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserRefreshTokenAsync_UserBlocked_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task UserRefreshTokenAsync_UserBlocked_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var token = GenerateToken(this.tokenSettings);
@@ -294,7 +294,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserRefreshTokenAsync_UserNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task UserRefreshTokenAsync_UserNotExist_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var token = GenerateToken(this.tokenSettings);
@@ -314,7 +314,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task UserRefreshTokenAsync_InvalidRefreshToken_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task UserRefreshTokenAsync_InvalidRefreshToken_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var token = GenerateToken(this.tokenSettings);
@@ -339,7 +339,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task SetUserNameAsync_SucceedUpdate_ShouldReturnIsSucceedTrue()
+        public async Task SetUserNameAsync_SucceedUpdate_ShouldReturnSucceededTrue()
         {
             // Arrange
             User expectedUser = new User();
@@ -367,7 +367,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task SetUserNameAsync_UserNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task SetUserNameAsync_UserNotExist_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -384,7 +384,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task RemoveUserAsync_SucceedRemoved_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task RemoveUserAsync_SucceedRemoved_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -407,7 +407,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task RemoveUserAsync_ErrorOnRemove_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task RemoveUserAsync_ErrorOnRemove_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -434,7 +434,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task RemoveUserAsync_UserNotExist_ShouldReturnIsSucceedTrue()
+        public async Task RemoveUserAsync_UserNotExist_ShouldReturnSucceededTrue()
         {
             // Arrange
             var claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -453,7 +453,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task BlockUserAsync_SucceedBlocked_ShouldReturnIsSucceedTrue()
+        public async Task BlockUserAsync_SucceedBlocked_ShouldReturnSucceededTrue()
         {
             // Arrange
             this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))
@@ -471,7 +471,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task BlockUserAsync_UserNotExist_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task BlockUserAsync_UserNotExist_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             // Act
@@ -483,7 +483,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
         }
 
         [Fact]
-        public async Task BlockUserAsync_FailureOnBlock_ShouldReturnIsSucceedFalseAndErrorMessage()
+        public async Task BlockUserAsync_FailureOnBlock_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
             this.userManagerMock.Setup(userManager => userManager.FindByIdAsync(It.IsAny<string>()))

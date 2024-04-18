@@ -9,6 +9,5 @@ namespace MovieCollection.Application.Features.DTOs
         public string Description { get; set; } = string.Empty;
         public DateTime ReleaseDate { get; set; }
         public TimeSpan Duration { get; set; }
-        public List<GenreResponse> Genres { get; set; } = new List<GenreResponse>();
     }
 }
