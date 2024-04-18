@@ -15,10 +15,14 @@ namespace MovieCollection.Server.Extensions
         {
             var principal = await base.CreateAsync(user);
 
-            ((ClaimsIdentity)principal.Identity).AddClaims(new[] { new Claim(ClaimTypes.Email, user.Email),
+            if (principal.Identity != null)
+            {
+                ((ClaimsIdentity)principal.Identity).AddClaims(new[] { new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
                                                                 new Claim(ClaimTypes.GivenName, user.FirstName),
                                                                 new Claim(ClaimTypes.Surname, user.LastName)
                                                              });
+
+            }
 
             return principal;
         }

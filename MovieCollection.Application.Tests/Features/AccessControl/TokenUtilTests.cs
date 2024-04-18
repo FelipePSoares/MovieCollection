@@ -1,5 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using AutoFixture;
 using FluentAssertions;
@@ -137,8 +136,8 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var principal = TokenUtil.GetPrincipalFromExpiredToken(tokenSettings, token);
 
             // Assert
-            principal?.Identity?.Should().NotBeNull();
-            principal.Identity.IsAuthenticated.Should().BeTrue();
+            principal.Identity.Should().NotBeNull();
+            principal.Identity?.IsAuthenticated.Should().BeTrue();
         }
 
         [Fact]

@@ -8,6 +8,7 @@ namespace MovieCollection.Application.Features
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IMovieService, MovieService>();
 
             return services;
         }

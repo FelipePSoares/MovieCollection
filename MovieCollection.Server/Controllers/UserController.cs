@@ -35,9 +35,6 @@ namespace MovieCollection.Server.Controllers
         {
             var result = await userService.UserLoginAsync(req);
 
-            if (!result.IsSucceed && result.Messages.ContainsKey("Blocked"))
-                return Forbid();
-
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
@@ -48,9 +45,6 @@ namespace MovieCollection.Server.Controllers
         public async Task<IActionResult> RefreshToken(UserRefreshTokenRequest req)
         {
             var result = await userService.UserRefreshTokenAsync(req);
-
-            if (!result.IsSucceed && result.Messages.ContainsKey("Blocked"))
-                return Forbid();
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }
@@ -102,26 +96,27 @@ namespace MovieCollection.Server.Controllers
         }
 
         [HttpDelete]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> RemoveUser()
         {
             var result = await userService.RemoveUserAsync(User);
 
-            return ValidateResponse(result, HttpStatusCode.OK);
+            return ValidateResponse(result, HttpStatusCode.NoContent);
         }
 
         [HttpDelete("{userId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Block(Guid userId)
         {
             var result = await userService.BlockUserAsync(userId);
 
-            return ValidateResponse(result, HttpStatusCode.OK);
+            return ValidateResponse(result, HttpStatusCode.NoContent);
         }
     }
 }

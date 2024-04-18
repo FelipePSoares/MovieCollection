@@ -22,14 +22,14 @@ namespace MovieCollection.Infrastructure {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class ValidationMessages {
+    public class MessageKey {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ValidationMessages() {
+        internal MessageKey() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace MovieCollection.Infrastructure {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MovieCollection.Infrastructure.ValidationMessages", typeof(ValidationMessages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MovieCollection.Infrastructure.MessageKey", typeof(MessageKey).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,56 +61,20 @@ namespace MovieCollection.Infrastructure {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Email not found.
+        ///   Looks up a localized string similar to Blocked.
         /// </summary>
-        public static string EmailNotFound {
+        public static string Blocked {
             get {
-                return ResourceManager.GetString("EmailNotFound", resourceCulture);
+                return ResourceManager.GetString("Blocked", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Movie not found.
+        ///   Looks up a localized string similar to NotFound.
         /// </summary>
-        public static string MovieNotFound {
+        public static string NotFound {
             get {
-                return ResourceManager.GetString("MovieNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} can&apos;t be null.
-        /// </summary>
-        public static string PropertyCantBeNull {
-            get {
-                return ResourceManager.GetString("PropertyCantBeNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} can&apos;t be null or empty.
-        /// </summary>
-        public static string PropertyCantBeNullOrEmpty {
-            get {
-                return ResourceManager.GetString("PropertyCantBeNullOrEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Refresh token expired.
-        /// </summary>
-        public static string RefreshTokenExpired {
-            get {
-                return ResourceManager.GetString("RefreshTokenExpired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to User not found.
-        /// </summary>
-        public static string UserNotFound {
-            get {
-                return ResourceManager.GetString("UserNotFound", resourceCulture);
+                return ResourceManager.GetString("NotFound", resourceCulture);
             }
         }
     }

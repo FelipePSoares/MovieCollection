@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Update="MessageKey.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MessageKey.resx</DependentUpon>
+    </Compile>
     <Compile Update="ValidationMessages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -14,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="MessageKey.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MessageKey.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="ValidationMessages.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>

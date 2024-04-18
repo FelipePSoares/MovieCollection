@@ -6,11 +6,7 @@ namespace MovieCollection.Common.Tests
     public class BaseTests
     {
         private static readonly object fixtureLock = new object();
-        private static Fixture fixture;
-
-        public BaseTests()
-        {
-        }
+        private static Fixture? fixture;
 
         protected static Fixture Fixture
         {
