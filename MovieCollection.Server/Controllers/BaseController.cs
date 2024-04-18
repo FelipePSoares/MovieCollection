@@ -11,13 +11,24 @@ namespace MovieCollection.Server.Controllers
             if (appResponse.IsSucceed)
                 return StatusCode((int)successStatusCode, appResponse.Data);
 
-            return BadRequest(appResponse.Messages);
+            return ValidateResponse(appResponse);
         }
 
         protected IActionResult ValidateResponse(AppResponse appResponse, HttpStatusCode successStatusCode)
         {
             if (appResponse.IsSucceed)
                 return StatusCode((int)successStatusCode);
+
+            return ValidateResponse(appResponse);
+        }
+
+        private IActionResult ValidateResponse(AppResponse appResponse)
+        {
+            if (appResponse.Messages.ContainsKey(MessageKey.NotFound))
+                return NotFound();
+
+            if (appResponse.Messages.ContainsKey(MessageKey.Blocked))
+                return Forbid();
 
             return BadRequest(appResponse.Messages);
         }

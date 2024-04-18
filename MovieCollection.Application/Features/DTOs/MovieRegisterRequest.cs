@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 
 namespace MovieCollection.Application.Features.DTOs
 {
-    public class MovieResponse
+    public class MovieRegisterRequest
     {
-        public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime ReleaseDate { get; set; }

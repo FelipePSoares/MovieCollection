@@ -311,7 +311,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
             // Assert
             response.IsSucceed.Should().BeFalse();
-            response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
+            response.Messages.Should().Contain(MessageKey.NotFound, ValidationMessages.UserNotFound);
         }
 
         [Fact]
@@ -381,7 +381,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
             // Assert
             response.IsSucceed.Should().BeFalse();
-            response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
+            response.Messages.Should().Contain(MessageKey.NotFound, ValidationMessages.UserNotFound);
         }
 
         [Fact]
@@ -480,7 +480,7 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
 
             // Assert
             response.IsSucceed.Should().BeFalse();
-            response.Messages.Should().Contain("User", ValidationMessages.UserNotFound);
+            response.Messages.Should().Contain(MessageKey.NotFound, ValidationMessages.UserNotFound);
         }
 
         [Fact]

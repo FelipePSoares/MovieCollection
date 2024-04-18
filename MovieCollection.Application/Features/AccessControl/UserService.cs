@@ -42,7 +42,7 @@ namespace MovieCollection.Application.Features.AccessControl
                 return AppResponse<UserLoginResponse>.Error(nameof(request.Email), ValidationMessages.EmailNotFound);
 
             if (!user.Enabled)
-                return AppResponse<UserLoginResponse>.Error("Blocked", string.Empty);
+                return AppResponse<UserLoginResponse>.Error(MessageKey.Blocked, string.Empty);
 
             var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (result.Succeeded)
@@ -73,15 +73,15 @@ namespace MovieCollection.Application.Features.AccessControl
         {
             var principal = TokenUtil.GetPrincipalFromExpiredToken(this.tokenSettings, request.AccessToken);
             if (principal == null || principal.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
-                return AppResponse<UserRefreshTokenResponse>.Error("User", ValidationMessages.UserNotFound);
+                return AppResponse<UserRefreshTokenResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
             var user = await this.userManager.FindByIdAsync(principal.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             if (user == null)
-                return AppResponse<UserRefreshTokenResponse>.Error("User", ValidationMessages.UserNotFound);
+                return AppResponse<UserRefreshTokenResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
             if (!user.Enabled)
-                return AppResponse<UserRefreshTokenResponse>.Error("Blocked", string.Empty);
+                return AppResponse<UserRefreshTokenResponse>.Error(MessageKey.Blocked, string.Empty);
 
             if (!await this.userManager.VerifyUserTokenAsync(user, this.tokenProvider, this.tokenPurpose, request.RefreshToken))
                 return AppResponse<UserRefreshTokenResponse>.Error(nameof(request.RefreshToken), ValidationMessages.RefreshTokenExpired);
@@ -108,7 +108,7 @@ namespace MovieCollection.Application.Features.AccessControl
             var user = await this.userManager.Users.Include(user => user.MovieCollection).FirstOrDefaultAsync(user => user.Id == id);
 
             if (user == null)
-                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+                return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
             return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
@@ -119,7 +119,7 @@ namespace MovieCollection.Application.Features.AccessControl
             var user = await this.userManager.FindByIdAsync(userId);
 
             if (user == null)
-                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+                return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
             user.FirstName = userDto.FirstName;
             user.LastName = userDto.LastName;
@@ -155,7 +155,7 @@ namespace MovieCollection.Application.Features.AccessControl
             var user = await this.userManager.FindByIdAsync(userId.ToString());
 
             if (user == null)
-                return AppResponse<UserProfileResponse>.Error("User", ValidationMessages.UserNotFound);
+                return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
             user.Enabled = false;
 
