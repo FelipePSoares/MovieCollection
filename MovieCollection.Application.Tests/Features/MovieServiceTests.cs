@@ -12,6 +12,7 @@ using MovieCollection.Common.Tests.Extensions;
 using MovieCollection.Domain;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.DTOs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace MovieCollection.Application.Tests.Features
@@ -112,6 +113,9 @@ namespace MovieCollection.Application.Tests.Features
             // Arrange
             var movie = Fixture.Create<MovieRegisterRequest>();
 
+            this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
+                .Returns(AppResponse<Movie>.Success(movie.FromDTO()));
+
             // Act
             var response = await this.movieService.RegisterAsync(movie);
 
@@ -129,31 +133,28 @@ namespace MovieCollection.Application.Tests.Features
 
             movie.Title = default!;
 
-            var error = new AppMessage("title", string.Format(ValidationMessages.PropertyCantBeNullOrEmpty, "title"));
-
             // Act
             var response = await this.movieService.RegisterAsync(movie);
 
             // Assert
             response.Succeeded.Should().BeFalse();
-            response.Messages.Should().Contain(error.Code, error.Description);
+            response.Messages.Should().Contain("Title", string.Format(ValidationMessages.PropertyCantBeNullOrEmpty, "Title"));
         }
 
         [Fact]
         public async Task RemoveAsync_SucceedRemoved_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
-            var movieId = Guid.NewGuid();
-            var movie = Fixture.Create<Movie>();
+            var movies = Fixture.Create<List<Movie>>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Trackable())
-                .Returns(new List<Movie>() { new() }.BuildMock());
+                .Returns(movies.BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Delete(It.IsAny<Movie>()))
                 .Returns(AppResponse.Success);
 
             // Act
-            var response = await this.movieService.RemoveAsync(movieId);
+            var response = await this.movieService.RemoveAsync(movies.First().Id);
 
             // Assert
             response.Succeeded.Should().BeTrue();
@@ -164,17 +165,16 @@ namespace MovieCollection.Application.Tests.Features
         public async Task RemoveAsync_ErrorOnRemove_ShouldReturnSucceededFalseAndErrorMessage()
         {
             // Arrange
-            var movieId = Guid.NewGuid();
-            var movie = Fixture.Create<Movie>();
+            var movies = Fixture.Create<List<Movie>>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Trackable())
-                .Returns(new List<Movie>() { new() }.BuildMock());
+                .Returns(movies.BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Delete(It.IsAny<Movie>()))
                 .Returns(AppResponse.Error("code", "description"));
 
             // Act
-            var response = await this.movieService.RemoveAsync(movieId);
+            var response = await this.movieService.RemoveAsync(movies.First().Id);
 
             // Assert
             response.Succeeded.Should().BeFalse();
@@ -185,13 +185,14 @@ namespace MovieCollection.Application.Tests.Features
         public async Task RemoveAsync_MovieNotExist_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var movieId = Guid.NewGuid();
+            this.movieRepositoryMock.Setup(movieRepository => movieRepository.Trackable())
+                .Returns(new List<Movie>().BuildMock());
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.Delete(It.IsAny<Movie>()))
                 .Verifiable();
 
             // Act
-            var response = await this.movieService.RemoveAsync(movieId);
+            var response = await this.movieService.RemoveAsync(Guid.NewGuid());
 
             // Assert
             response.Succeeded.Should().BeTrue();

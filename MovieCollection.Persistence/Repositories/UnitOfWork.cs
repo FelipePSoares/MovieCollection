@@ -11,7 +11,7 @@ namespace MovieCollection.Persistence.Repositories
         private readonly MovieCollectionDatabaseContext context;
         private readonly Lazy<IGenericRepository<Movie>> movieRepository;
 
-        public UnitOfWork(MovieCollectionDatabaseContext dbContext, ILogger logger)
+        public UnitOfWork(MovieCollectionDatabaseContext dbContext, ILogger<UnitOfWork> logger)
         {
             this.context = dbContext;
             this.movieRepository = new Lazy<IGenericRepository<Movie>>(() => new GenericRepository<Movie>(this.context, logger));

@@ -25,14 +25,42 @@ namespace MovieCollection.Application.Features
             return AppResponse<MovieResponse>.Success(movie.ToMovieResponse());
         }
 
-        public Task<AppResponse<MovieResponse>> RegisterAsync(MovieRegisterRequest req)
+        public async Task<AppResponse<MovieResponse>> RegisterAsync(MovieRegisterRequest req)
         {
-            throw new NotImplementedException();
+            var movie = req.FromDTO();
+
+            var validationResult = movie.IsValid();
+
+            if (!validationResult.Succeeded)
+                return AppResponse<MovieResponse>.Error(validationResult.Messages);
+
+            var result = this.unitOfWork.MovieRepository.InsertOrUpdate(movie);
+            
+            if (result.Succeeded)
+            {
+                await this.unitOfWork.CommitAsync();
+                return AppResponse<MovieResponse>.Success(result.Data.ToMovieResponse());
+            }
+
+            return AppResponse<MovieResponse>.Error(result.Messages);
         }
 
-        public Task<AppResponse> RemoveAsync(Guid movieId)
+        public async Task<AppResponse> RemoveAsync(Guid movieId)
         {
-            throw new NotImplementedException();
+            var movie = await unitOfWork.MovieRepository.Trackable().FirstOrDefaultAsync(movie => movie.Id == movieId);
+
+            if (movie == null)
+                return AppResponse.Success();
+
+            var result = this.unitOfWork.MovieRepository.Delete(movie);
+
+            if (result.Succeeded)
+            {
+                await this.unitOfWork.CommitAsync();
+                return AppResponse.Success();
+            }
+
+            return result;
         }
 
         public Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter)

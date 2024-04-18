@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Configuration;
 using MovieCollection.Application.Features;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure.Authentication;
 using MovieCollection.Persistence;
 using MovieCollection.Server.Extensions;
 using Newtonsoft.Json.Converters;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,10 +34,17 @@ builder.Services.AddControllers(config =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Add support to logging with SERILOG
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+//Add support to logging request with SERILOG
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

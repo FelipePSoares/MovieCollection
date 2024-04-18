@@ -18,14 +18,14 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(typeof(List<MovieResponse>), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> Get([FromQuery] string title, [FromQuery] DateTime releaseDateStart, [FromQuery] DateTime releaseDateEnd, [FromQuery] List<Guid> genres)
+        public async Task<IActionResult> Get([FromQuery] string? title, [FromQuery] DateTime? releaseDateStart, [FromQuery] DateTime? releaseDateEnd, [FromQuery] List<Guid>? genres)
         {
             var filter = new MovieFilters()
             {
                 Title = title,
                 ReleaseDateStart = releaseDateStart,
                 ReleaseDateEnd = releaseDateEnd,
-                Genres = genres
+                Genres = genres ?? new List<Guid>()
             };
 
             AppResponse<List<MovieResponse>> result = await this.movieService.SearchAsync(filter);
