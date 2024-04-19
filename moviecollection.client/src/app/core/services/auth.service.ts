@@ -3,6 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable, concatMap, map } from 'rxjs';
 import { UserService } from '../services/user.service';
 import { User } from '../models/User';
+import { Token } from '../models/token';
+
+const TOKEN_DATA = "token_data";
 
 @Injectable({
   providedIn: 'root',
@@ -17,15 +20,15 @@ export class AuthService {
   }
 
   public signIn(email: string, password: string): Observable<User> {
-    return this.http.post('/api/user/login', {
+    return this.http.post<Token>('/api/user/login', {
       email: email,
       password: password
     }, {
-      observe: 'response'
+      observe: 'body',
+      responseType: 'json'
     })
-      .pipe(concatMap(res => {
-        return this.userService.refreshUserInfo();
-      }));
+      .pipe(map(res => localStorage.setItem(TOKEN_DATA, JSON.stringify(res))),
+        concatMap(res => this.userService.refreshUserInfo()));
   }
 
   public signOut(): Observable<boolean> {

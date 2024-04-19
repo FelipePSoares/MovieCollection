@@ -14,8 +14,7 @@ import { LogoutComponent } from './authentication/logout/logout.component';
 import { FirstSignInComponent } from './authentication/first-sign-in/first-sign-in.component';
 import { SpinnerComponent } from '../core/components/spinner/spinner.component';
 import { LoadingInterceptor } from '../core/interceptor/loading.interceptor';
-//import { ListProjectsComponent } from './project/list-projects/list-projects.component';
-//import { AddProjectComponent } from './project/add-project/add-project.component';
+import { ProfileComponent } from './user/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -25,9 +24,8 @@ import { LoadingInterceptor } from '../core/interceptor/loading.interceptor';
     RegisterComponent,
     LogoutComponent,
     FirstSignInComponent,
-    //ListProjectsComponent,
-    //AddProjectComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

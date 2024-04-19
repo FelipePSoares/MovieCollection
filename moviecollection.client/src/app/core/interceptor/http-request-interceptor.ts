@@ -7,6 +7,8 @@ import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
+const TOKEN_DATA = "token_data";
+
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
   constructor(private router: Router, private authService: AuthService) { }
@@ -24,11 +26,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler):
     Observable<HttpEvent<any>> {
-      
-    req = req.clone({
-      withCredentials: true
-    });
+      const token = localStorage.getItem(TOKEN_DATA);
 
-    return next.handle(req).pipe(catchError(x => this.handleAuthError(x)));
+      if (!token) {
+        return next.handle(req).pipe(catchError(x => this.handleAuthError(x)));
+      }
+
+      req = req.clone({
+        headers: req.headers.set('Authorization', `Bearer ${JSON.parse(token).accessToken}`),
+      });
+
+      return next.handle(req).pipe(catchError(x => this.handleAuthError(x)));
   }
 }

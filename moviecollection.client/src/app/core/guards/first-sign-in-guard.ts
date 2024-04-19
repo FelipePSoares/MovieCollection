@@ -18,11 +18,11 @@ export class FirstSignInGuard {
   isFirstSignIn(): Observable<boolean> {
     return this.userService.loggedUser$.pipe(
       map((user) => {
-        if (user.isFirstLogin) {
+        if (user.hasIncompletedInformation) {
           this.router.navigate(['first-signin']);
         }
 
-        return !user.isFirstLogin;
+        return !user.hasIncompletedInformation;
       }));
   }
 }

@@ -13,5 +13,6 @@
     <Folder Include="src\app\core\interfaces\" />
     <Folder Include="src\app\core\services\" />
     <Folder Include="src\app\core\utils\custom-validators\" />
+    <Folder Include="src\app\features\user\" />
   </ItemGroup>
 </Project>
