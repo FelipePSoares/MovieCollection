@@ -112,7 +112,7 @@ namespace MovieCollection.Application.Tests.Features
         public async Task RegisterAsync_SucessRegistration_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var movie = Fixture.Create<MovieRegisterRequest>();
+            var movie = Fixture.Create<MovieRequest>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
                 .Returns(AppResponse<Movie>.Success(movie.FromDTO()));
@@ -130,7 +130,7 @@ namespace MovieCollection.Application.Tests.Features
         public async Task RegisterAsync_FailedRegistration_ShouldReturnSucceededFalseAndTheMessage()
         {
             // Arrange
-            var movie = Fixture.Create<MovieRegisterRequest>();
+            var movie = Fixture.Create<MovieRequest>();
 
             movie.Title = default!;
 
@@ -226,13 +226,13 @@ namespace MovieCollection.Application.Tests.Features
                 }
             };
 
-            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieRequest>();
             jsonPatch.Replace(t => t.Title, expected.Title);
             jsonPatch.Replace(t => t.Description, expected.Description);
             jsonPatch.Replace(t => t.ReleaseYear, expected.ReleaseYear);
             jsonPatch.Replace(t => t.Duration, expected.Duration);
             jsonPatch.Remove(t => t.Genres, 1);
-            jsonPatch.Add(t => t.Genres, expected.Genres.Last().ToGenreUpdate());
+            jsonPatch.Add(t => t.Genres, expected.Genres.Last().ToGenreRequest());
 
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
@@ -266,7 +266,7 @@ namespace MovieCollection.Application.Tests.Features
             // Arrange
             var movie = Fixture.Create<Movie>();
 
-            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieRequest>();
             jsonPatch.Replace(t => t.Title, string.Empty);
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
@@ -289,7 +289,7 @@ namespace MovieCollection.Application.Tests.Features
         public async Task UpdateAsync_MovieNotExist_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieRequest>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
                 .Returns(new List<Movie>().BuildMock());

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +26,7 @@ namespace MovieCollection.Application.Features
             return AppResponse<MovieResponse>.Success(movie.ToMovieResponse());
         }
 
-        public async Task<AppResponse<MovieResponse>> RegisterAsync(MovieRegisterRequest req)
+        public async Task<AppResponse<MovieResponse>> RegisterAsync(MovieRequest req)
         {
             var movie = req.FromDTO();
 
@@ -78,14 +76,14 @@ namespace MovieCollection.Application.Features
             return AppResponse<List<MovieResponse>>.Success(movies.ToMovieResponse());
         }
 
-        public async Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieUpdateRequest> movieDto)
+        public async Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieRequest> movieDto)
         {
             var movie = await unitOfWork.MovieRepository.NoTrackable().Include(movie => movie.Genres).FirstOrDefaultAsync(movie => movie.Id == movieId);
 
             if (movie == null)
                 return AppResponse<MovieResponse>.Error(MessageKey.NotFound, ValidationMessages.MovieNotFound);
 
-            var movieRequest = movie.ToMovieUpdate();
+            var movieRequest = movie.ToMovieRequest();
 
             movieDto.ApplyTo(movieRequest);
             movie = movieRequest.FromDTO();

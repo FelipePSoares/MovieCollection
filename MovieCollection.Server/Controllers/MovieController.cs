@@ -40,7 +40,7 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(typeof(MovieResponse), 201)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> Register(MovieRegisterRequest req)
+        public async Task<IActionResult> Register(MovieRequest req)
         {
             var result = await this.movieService.RegisterAsync(req);
 
@@ -51,7 +51,7 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(typeof(MovieResponse), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> Update(Guid movieId, [FromBody] JsonPatchDocument<MovieUpdateRequest> movieDto)
+        public async Task<IActionResult> Update(Guid movieId, [FromBody] JsonPatchDocument<MovieRequest> movieDto)
         {
             var result = await this.movieService.UpdateAsync(movieId, movieDto);
 
