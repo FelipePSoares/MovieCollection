@@ -1,0 +1,40 @@
+<div class="limiter">
+  <div class="container-login">
+    <div class="wrap-login">
+      <span class="login-form-title mb-5">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="height:50px" class="bi bi-film" viewBox="0 0 16 16">
+          <path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm4 0v6h8V1zm8 8H4v6h8zM1 1v2h2V1zm2 3H1v2h2zM1 7v2h2V7zm2 3H1v2h2zm-2 3v2h2v-2zM15 1h-2v2h2zm-2 3v2h2V4zm2 3h-2v2h2zm-2 3v2h2v-2zm2 3h-2v2h2z" />
+        </svg>
+        Movie Collection
+      </span>
+      <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-floating mb-1">
+          <p>Please sign in</p>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched">
+          <label for="floatingInput">Email address</label>
+          <div *ngIf="email?.invalid && email?.touched">
+            <div *ngIf="email?.errors?.['required']" class="text-danger">Email is required.</div>
+            <div *ngIf="email?.errors?.['email']" class="text-danger">Invalid email format.</div>
+          </div>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="floatingPassword" placeholder="Password" formControlName="password" [class.is-invalid]="password?.invalid && password?.touched">
+          <label for="floatingPassword">Password</label>
+          <div *ngIf="password?.invalid && password?.touched">
+            <div *ngIf="password?.errors?.['required']" class="text-danger">Password is required.</div>
+          </div>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit" [disabled]="loginForm.invalid">Sign in</button>
+        <div *ngIf="httpErrors">
+          <p class="mt-5 mb-3 text-danger text-center">{{errors.statusText}}</p>
+        </div>
+      </form>
+      <span class="login-footer">
+        Need an account?
+        <a [routerLink]="['/register']" routerLinkActive="active">Sign up</a>
+      </span>
+    </div>
+  </div>
+</div>
