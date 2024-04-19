@@ -1,0 +1,61 @@
+<div class="limiter">
+  <div class="container-register">
+    <div class="wrap-register">
+      <span class="register-form-title mb-5">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" style="height:50px" class="bi bi-film" viewBox="0 0 16 16">
+          <path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm4 0v6h8V1zm8 8H4v6h8zM1 1v2h2V1zm2 3H1v2h2zM1 7v2h2V7zm2 3H1v2h2zm-2 3v2h2v-2zM15 1h-2v2h2zm-2 3v2h2V4zm2 3h-2v2h2zm-2 3v2h2v-2zm2 3h-2v2h2z" />
+        </svg>
+        Movie Collection
+      </span>
+      <form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-floating mb-1">
+          <p>Please sign up</p>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="email" placeholder="name@example.com" formControlName="email" [class.is-invalid]="email?.invalid && email?.touched">
+          <label for="email">Email address</label>
+          <div *ngIf="email?.invalid && email?.touched">
+            <div *ngIf="email?.errors?.['required']" class="text-danger">Email is required.</div>
+            <div *ngIf="email?.errors?.['email']" class="text-danger">Invalid email format.</div>
+          </div>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="password" placeholder="Password" formControlName="password" [class.is-invalid]="password?.invalid && password?.touched">
+          <label for="password">Password</label>
+          <div *ngIf="password?.invalid && password?.touched">
+            <div *ngIf="password?.errors?.['required']" class="text-danger">Password is required.</div>
+            <div *ngIf="password?.errors?.['pattern']" class="text-danger">
+              Password must have:
+              <ul>
+                <li>One lowercase character</li>
+                <li>One uppercase character</li>
+                <li>One number</li>
+                <li>One special character</li>
+                <li>8 characters minimum</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="confirmPassword" placeholder="Password" formControlName="confirmPassword" [class.is-invalid]="confirmPassword?.invalid && confirmPassword?.touched">
+          <label for="confirmPassword">Confirm Password</label>
+          <div *ngIf="confirmPassword?.invalid && confirmPassword?.touched">
+            <div *ngIf="confirmPassword?.errors?.['required']" class="text-danger">Password is required.</div>
+          </div>
+        </div>
+        <div *ngIf="registerForm.errors?.['passwordMismatch'] && (registerForm.touched || registerForm.dirty)">
+          <p class="mb-3 text-danger text-center">Password must match</p>
+        </div>
+        <div *ngIf="httpErrors">
+          <p class="mb-3 text-danger text-center" *ngIf="errors['DuplicateEmail']">{{errors['DuplicateEmail']}}</p>
+          <p class="mb-3 text-danger text-center" *ngIf="!errors['DuplicateEmail']">Error. Try again...</p>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit" [disabled]="registerForm.invalid">Sign up</button>
+      </form>
+      <span class="register-footer">
+        Already have an account?
+        <a [routerLink]="['/login']" routerLinkActive="active">Sign in</a>
+      </span>
+    </div>
+  </div>
+</div>

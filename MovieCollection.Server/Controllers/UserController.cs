@@ -9,7 +9,7 @@ using MovieCollection.Application.Features.AccessControl.DTOs;
 namespace MovieCollection.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController(IUserService userService) : BaseController
     {
         private readonly IUserService userService = userService;
@@ -58,7 +58,7 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]
         [ProducesResponseType(typeof(UserProfileResponse), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
@@ -82,7 +82,7 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
-        [HttpPut("[action]")]
+        [HttpPut]
         [ProducesResponseType(typeof(UserProfileResponse), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
