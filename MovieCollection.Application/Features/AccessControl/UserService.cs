@@ -4,9 +4,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
+using MovieCollection.Application.Contracts.Persistence;
 using MovieCollection.Application.Features.AccessControl.DTOs;
 using MovieCollection.Application.Features.AccessControl.Mappers;
+using MovieCollection.Domain;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.Authentication;
@@ -20,19 +23,19 @@ namespace MovieCollection.Application.Features.AccessControl
         private readonly string tokenPurpose = "RefreshToken";
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
-        private readonly RoleManager<IdentityRole<Guid>> roleManager;
         private readonly TokenSettings tokenSettings;
+        private readonly IUnitOfWork unitOfWork;
 
         public UserService(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            RoleManager<IdentityRole<Guid>> roleManager,
-            TokenSettings tokenSettings)
+            TokenSettings tokenSettings,
+            IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.roleManager = roleManager;
             this.tokenSettings = tokenSettings;
+            this.unitOfWork = unitOfWork;
         }
 
         public async Task<AppResponse<UserLoginResponse>> UserLoginAsync(UserLoginRequest request)
@@ -106,7 +109,10 @@ namespace MovieCollection.Application.Features.AccessControl
 
         public async Task<AppResponse<UserProfileResponse>> GetUserByIdAsync(Guid id)
         {
-            var user = await this.userManager.Users.Include(user => user.MovieCollection).FirstOrDefaultAsync(user => user.Id == id);
+            var user = await this.userManager.Users
+                .Include(user => user.MovieCollection)
+                    .ThenInclude(movie => movie.Genres)
+                .FirstOrDefaultAsync(user => user.Id == id);
 
             if (user == null)
                 return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
@@ -126,10 +132,34 @@ namespace MovieCollection.Application.Features.AccessControl
             user.LastName = userDto.LastName;
             user.HasIncompletedInformation = false;
 
-            await this.userManager.UpdateAsync(user);
-            await this.LogoutAsync(user);
+            var result = await this.userManager.UpdateAsync(user);
 
-            return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+            if (result.Succeeded)
+                return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+
+            return AppResponse<UserProfileResponse>.Error(GetRegisterErrors(result));
+        }
+
+        public async Task<AppResponse<UserProfileResponse>> UpdateMovieCollectionAsync(ClaimsPrincipal userLogged, JsonPatchDocument<UserMovieCollection> userMovieCollection)
+        {
+            var userId = new Guid(userLogged.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var user = await this.userManager.Users.Include(u => u.MovieCollection).FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
+
+            var userRequest = user.ToUserMovieCollection();
+
+            userMovieCollection.ApplyTo(userRequest);
+            user.MovieCollection = await this.unitOfWork.MovieRepository.Trackable()
+                .Where(movie => userRequest.MovieCollection.Select(m => m.Id).Contains(movie.Id)).ToListAsync();
+
+            var result = await this.userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+                return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+
+            return AppResponse<UserProfileResponse>.Error(GetRegisterErrors(result));
         }
 
         public async Task<AppResponse> RemoveUserAsync(ClaimsPrincipal user)

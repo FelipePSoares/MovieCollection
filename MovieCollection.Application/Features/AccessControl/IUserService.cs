@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 using MovieCollection.Application.Features.AccessControl.DTOs;
 using MovieCollection.Infrastructure.DTOs;
 
@@ -16,5 +17,6 @@ namespace MovieCollection.Application.Features.AccessControl
         Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto);
         Task<AppResponse> RemoveUserAsync(ClaimsPrincipal user);
         Task<AppResponse> BlockUserAsync(Guid userId);
+        Task<AppResponse<UserProfileResponse>> UpdateMovieCollectionAsync(ClaimsPrincipal user, JsonPatchDocument<UserMovieCollection> userMovieCollection);
     }
 }

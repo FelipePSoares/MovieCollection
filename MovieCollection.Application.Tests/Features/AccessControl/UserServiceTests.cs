@@ -11,6 +11,7 @@ using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.Authentication;
 using MovieCollection.Common.Tests.Extensions;
+using MovieCollection.Application.Contracts.Persistence;
 
 namespace MovieCollection.Application.Tests.Features.AccessControl
 {
@@ -18,8 +19,8 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
     {
         private readonly Mock<UserManager<User>> userManagerMock;
         private readonly Mock<SignInManager<User>> signInManagerMock;
-        private readonly Mock<RoleManager<IdentityRole<Guid>>> roleManagerMock;
         private readonly TokenSettings tokenSettings;
+        private readonly Mock<IUnitOfWork> unitOfWork;
         private readonly IUserService userService;
 
         public UserServiceTests()
@@ -29,14 +30,13 @@ namespace MovieCollection.Application.Tests.Features.AccessControl
             var contextAccessorMock = new Mock<IHttpContextAccessor>();
             var claimsFactoryMock = new Mock<IUserClaimsPrincipalFactory<User>>();
             this.signInManagerMock = new Mock<SignInManager<User>>(this.userManagerMock.Object, contextAccessorMock.Object, claimsFactoryMock.Object, default!, default!, default!);
-            var roleStore = new Mock<IRoleStore<IdentityRole<Guid>>>();
-            this.roleManagerMock = new Mock<RoleManager<IdentityRole<Guid>>>(roleStore.Object, default!, default!, default!, default!);
             this.tokenSettings = new TokenSettings()
             {
                 SecretKey = Guid.NewGuid().ToString()
             };
+            this.unitOfWork = new Mock<IUnitOfWork>();
 
-            this.userService = new UserService(this.userManagerMock.Object, this.signInManagerMock.Object, this.roleManagerMock.Object, this.tokenSettings);
+            this.userService = new UserService(this.userManagerMock.Object, this.signInManagerMock.Object, this.tokenSettings, this.unitOfWork.Object);
         }
 
         [Fact]
