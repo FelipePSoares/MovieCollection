@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
+using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Server.Controllers
 {
@@ -58,7 +59,7 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
-        [HttpGet]
+        [HttpGet("[action]")]
         [ProducesResponseType(typeof(UserProfileResponse), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
@@ -67,6 +68,17 @@ namespace MovieCollection.Server.Controllers
             var userId = User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
 
             var result = await userService.GetUserByIdAsync(new Guid(userId));
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(List<UserProfileResponse>), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await userService.GetAllUsersAsync();
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }
