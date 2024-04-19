@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.JsonPatch;
 using MockQueryable.Moq;
@@ -11,10 +10,8 @@ using MovieCollection.Application.Features.Mappers;
 using MovieCollection.Common.Tests;
 using MovieCollection.Common.Tests.Extensions;
 using MovieCollection.Domain;
-using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.DTOs;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace MovieCollection.Application.Tests.Features
@@ -22,6 +19,7 @@ namespace MovieCollection.Application.Tests.Features
     public class MovieServiceTests : BaseTests
     {
         private readonly IMovieService movieService = default!;
+        private readonly Mock<IGenreService> genreServiceMock = default!;
         private readonly Mock<IGenericRepository<Movie>> movieRepositoryMock = default!;
 
         public MovieServiceTests()
@@ -30,7 +28,9 @@ namespace MovieCollection.Application.Tests.Features
             this.movieRepositoryMock = new Mock<IGenericRepository<Movie>>();
             unitOfWork.Setup(uw => uw.MovieRepository).Returns(this.movieRepositoryMock.Object);
 
-            this.movieService = new MovieService(unitOfWork.Object);
+            this.genreServiceMock = new Mock<IGenreService>();
+
+            this.movieService = new MovieService(unitOfWork.Object, this.genreServiceMock.Object);
         }
 
         [Fact]
@@ -112,13 +112,17 @@ namespace MovieCollection.Application.Tests.Features
         public async Task RegisterAsync_SucessRegistration_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var movie = Fixture.Create<MovieRegisterRequest>();
+            var movieRequest = Fixture.Create<MovieRequest>();
+            var movie = movieRequest.FromDTO();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
-                .Returns(AppResponse<Movie>.Success(movie.FromDTO()));
+                .Returns(AppResponse<Movie>.Success(movie));
+
+            this.genreServiceMock.Setup(genreService => genreService.RegisterAsync(It.IsAny<List<Genre>>()))
+                .ReturnsAsync(AppResponse<List<Genre>>.Success(movie.Genres));
 
             // Act
-            var response = await this.movieService.RegisterAsync(movie);
+            var response = await this.movieService.RegisterAsync(movieRequest);
 
             // Assert
             response.Succeeded.Should().BeTrue();
@@ -130,7 +134,7 @@ namespace MovieCollection.Application.Tests.Features
         public async Task RegisterAsync_FailedRegistration_ShouldReturnSucceededFalseAndTheMessage()
         {
             // Arrange
-            var movie = Fixture.Create<MovieRegisterRequest>();
+            var movie = Fixture.Create<MovieRequest>();
 
             movie.Title = default!;
 
@@ -226,13 +230,13 @@ namespace MovieCollection.Application.Tests.Features
                 }
             };
 
-            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieRequest>();
             jsonPatch.Replace(t => t.Title, expected.Title);
             jsonPatch.Replace(t => t.Description, expected.Description);
             jsonPatch.Replace(t => t.ReleaseYear, expected.ReleaseYear);
             jsonPatch.Replace(t => t.Duration, expected.Duration);
             jsonPatch.Remove(t => t.Genres, 1);
-            jsonPatch.Add(t => t.Genres, expected.Genres.Last().ToGenreUpdate());
+            jsonPatch.Add(t => t.Genres, expected.Genres.Last().ToGenreRequest());
 
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
@@ -241,6 +245,9 @@ namespace MovieCollection.Application.Tests.Features
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
                 .Callback((Movie m) => movieUpdated = m)
                 .Returns(AppResponse<Movie>.Success(movie));
+
+            this.genreServiceMock.Setup(genreService => genreService.RegisterAsync(It.IsAny<List<Genre>>()))
+                .ReturnsAsync((List <Genre> genres) => AppResponse<List<Genre>>.Success(genres));
 
             // Act
             var response = await this.movieService.UpdateAsync(movie.Id, jsonPatch);
@@ -266,7 +273,7 @@ namespace MovieCollection.Application.Tests.Features
             // Arrange
             var movie = Fixture.Create<Movie>();
 
-            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieRequest>();
             jsonPatch.Replace(t => t.Title, string.Empty);
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
@@ -289,7 +296,7 @@ namespace MovieCollection.Application.Tests.Features
         public async Task UpdateAsync_MovieNotExist_ShouldReturnSucceededTrue()
         {
             // Arrange
-            var jsonPatch = new JsonPatchDocument<MovieUpdateRequest>();
+            var jsonPatch = new JsonPatchDocument<MovieRequest>();
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
                 .Returns(new List<Movie>().BuildMock());

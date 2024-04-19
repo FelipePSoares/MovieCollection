@@ -21,26 +21,26 @@ namespace MovieCollection.Application.Features.Mappers
             };
         }
 
-        public static List<GenreUpdateRequest> ToGenreUpdate(this IEnumerable<Genre> genres)
+        public static List<GenreRequest> ToGenreRequest(this IEnumerable<Genre> genres)
         {
-            return genres.Select(genre => genre.ToGenreUpdate()).ToList();
+            return genres.Select(genre => genre.ToGenreRequest()).ToList();
         }
 
-        public static GenreUpdateRequest ToGenreUpdate(this Genre genre)
+        public static GenreRequest ToGenreRequest(this Genre genre)
         {
-            return new GenreUpdateRequest
+            return new GenreRequest
             {
                 Id = genre.Id,
                 Name = genre.Name
             };
         }
 
-        public static List<Genre> FromDTO(this IEnumerable<GenreUpdateRequest> genres)
+        public static List<Genre> FromDTO(this IEnumerable<GenreRequest> genres)
         {
             return genres.Select(genre => genre.FromDTO()).ToList();
         }
 
-        public static Genre FromDTO(this GenreUpdateRequest genre)
+        public static Genre FromDTO(this GenreRequest genre)
         {
             return new Genre
             {

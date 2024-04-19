@@ -25,30 +25,7 @@ namespace MovieCollection.Application.Features.Mappers
             };
         }
 
-        public static Movie FromDTO(this MovieRegisterRequest movieRegister)
-        {
-            return new Movie()
-            {
-                Title = movieRegister.Title,
-                Description = movieRegister.Description,
-                ReleaseYear = movieRegister.ReleaseYear,
-                Duration = movieRegister.Duration
-            };
-        }
-
-        public static MovieUpdateRequest ToMovieUpdate(this Movie movie)
-        {
-            return new MovieUpdateRequest
-            {
-                Title = movie.Title,
-                Description = movie.Description,
-                ReleaseYear = movie.ReleaseYear,
-                Duration = movie.Duration,
-                Genres = movie.Genres.ToGenreUpdate(),
-            };
-        }
-
-        public static Movie FromDTO(this MovieUpdateRequest movieRequest)
+        public static Movie FromDTO(this MovieRequest movieRequest)
         {
             return new Movie()
             {
@@ -57,6 +34,18 @@ namespace MovieCollection.Application.Features.Mappers
                 ReleaseYear = movieRequest.ReleaseYear,
                 Duration = movieRequest.Duration,
                 Genres = movieRequest.Genres.FromDTO()
+            };
+        }
+
+        public static MovieRequest ToMovieRequest(this Movie movie)
+        {
+            return new MovieRequest
+            {
+                Title = movie.Title,
+                Description = movie.Description,
+                ReleaseYear = movie.ReleaseYear,
+                Duration = movie.Duration,
+                Genres = movie.Genres.ToGenreRequest(),
             };
         }
     }
