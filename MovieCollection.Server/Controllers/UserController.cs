@@ -9,7 +9,7 @@ using MovieCollection.Application.Features.AccessControl.DTOs;
 namespace MovieCollection.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController(IUserService userService) : BaseController
     {
         private readonly IUserService userService = userService;

@@ -17,7 +17,7 @@ export class AuthService {
   }
 
   public signIn(email: string, password: string): Observable<User> {
-    return this.http.post('/user/login', {
+    return this.http.post('/api/user/login', {
       email: email,
       password: password
     }, {
@@ -31,13 +31,13 @@ export class AuthService {
   public signOut(): Observable<boolean> {
     this.userService.removeUserInfo();
 
-    return this.http.post('/user/logout', null, {
+    return this.http.post('/api/user/logout', null, {
       observe: 'response'
     }).pipe<boolean>(map(res => res.ok));
   }
 
   public register(email: string, password: string): Observable<boolean> {
-    return this.http.post('/user/register', {
+    return this.http.post('/api/user/register', {
       email: email,
       password: password
     }, {

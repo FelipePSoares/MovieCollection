@@ -25,7 +25,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css"
             ],
             "scripts": []
           },
@@ -60,10 +62,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "moviecollection.client:build:production"
+              "buildTarget": "moviecollection.client:build:production"
             },
             "development": {
-              "browserTarget": "moviecollection.client:build:development"
+              "buildTarget": "moviecollection.client:build:development"
             }
           },
           "defaultConfiguration": "development",
@@ -74,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "moviecollection.client:build"
+            "buildTarget": "moviecollection.client:build"
           }
         },
         "test": {

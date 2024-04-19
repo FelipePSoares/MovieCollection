@@ -9,7 +9,7 @@ using MovieCollection.Infrastructure.DTOs;
 namespace MovieCollection.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class MovieController(IMovieService movieService) : BaseController
     {
         private readonly IMovieService movieService = movieService;

@@ -21,7 +21,7 @@ export class UserService {
   }
 
   public refreshUserInfo(): Observable<User> {
-    return this.http.get<User>('/user/', {
+    return this.http.get<User>('/api/user/', {
       observe: 'body',
       responseType: 'json'
     }).pipe(map(user => {
@@ -37,7 +37,7 @@ export class UserService {
   }
 
   public setUserInfo(firstName: string, lastName: string): Observable<User> {
-    return this.http.put('/user/', {
+    return this.http.put('/api/user/', {
       firstName: firstName,
       lastName: lastName
     }).pipe(concatMap(res => {
