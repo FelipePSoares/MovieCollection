@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using MovieCollection.Application.Contracts.Persistence;
 using MovieCollection.Application.Features.AccessControl.DTOs;
 using MovieCollection.Application.Features.AccessControl.Mappers;
-using MovieCollection.Domain;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.Authentication;
@@ -118,6 +117,17 @@ namespace MovieCollection.Application.Features.AccessControl
                 return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
             return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+        }
+
+        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync()
+        {
+            var adminUsers = await this.userManager.GetUsersInRoleAsync("Administrator");
+
+            var users = await this.userManager.Users
+                .Where(user => !adminUsers.Select(a => a.Id).Contains(user.Id))
+                .ToListAsync();
+
+            return AppResponse<List<UserProfileResponse>>.Success(users.ToUserProfileResponse());
         }
 
         public async Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto)

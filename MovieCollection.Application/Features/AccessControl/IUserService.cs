@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
@@ -18,5 +19,6 @@ namespace MovieCollection.Application.Features.AccessControl
         Task<AppResponse> RemoveUserAsync(ClaimsPrincipal user);
         Task<AppResponse> BlockUserAsync(Guid userId);
         Task<AppResponse<UserProfileResponse>> UpdateMovieCollectionAsync(ClaimsPrincipal user, JsonPatchDocument<UserMovieCollection> userMovieCollection);
+        Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync();
     }
 }
