@@ -25,6 +25,18 @@ namespace MovieCollection.Domain
             if (string.IsNullOrEmpty(this.Title))
                 erroMessages.Add(new AppMessage(nameof(this.Title), String.Format(ValidationMessages.PropertyCantBeNullOrEmpty, nameof(this.Title))));
 
+            for (int i = 0; i < this.Genres.Count; i++)
+            {
+                var genre = this.Genres[i];
+                var result = genre.IsValid();
+
+                if (!result.Succeeded)
+                {
+                    result.Messages.ToList().ForEach(message => message.Code = $"Genres[{i}].{message.Code}");
+                    erroMessages.AddRange(result.Messages);
+                }
+            }
+
             if (erroMessages.Any())
                 return AppResponse.Error(erroMessages);
 

@@ -7,14 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using MovieCollection.Application.Contracts.Persistence;
 using MovieCollection.Application.Features.DTOs;
 using MovieCollection.Application.Features.Mappers;
+using MovieCollection.Domain;
 using MovieCollection.Infrastructure;
 using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Application.Features
 {
-    public class MovieService(IUnitOfWork unitOfWork) : IMovieService
+    public class MovieService(IUnitOfWork unitOfWork, IGenreService genreService) : IMovieService
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
+        private readonly IGenreService genreService = genreService;
 
         public async Task<AppResponse<MovieResponse>> GetByIdAsync(Guid movieId)
         {
@@ -30,20 +32,7 @@ namespace MovieCollection.Application.Features
         {
             var movie = req.FromDTO();
 
-            var validationResult = movie.IsValid();
-
-            if (!validationResult.Succeeded)
-                return AppResponse<MovieResponse>.Error(validationResult.Messages);
-
-            var result = this.unitOfWork.MovieRepository.InsertOrUpdate(movie);
-            
-            if (result.Succeeded)
-            {
-                await this.unitOfWork.CommitAsync();
-                return AppResponse<MovieResponse>.Success(result.Data.ToMovieResponse());
-            }
-
-            return AppResponse<MovieResponse>.Error(result.Messages);
+            return await InsertOrUpdateAsync(movie);
         }
 
         public async Task<AppResponse> RemoveAsync(Guid movieId)
@@ -63,7 +52,7 @@ namespace MovieCollection.Application.Features
 
             return result;
         }
-        
+
         public async Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter)
         {
             var movies = await unitOfWork.MovieRepository
@@ -89,20 +78,33 @@ namespace MovieCollection.Application.Features
             movie = movieRequest.FromDTO();
             movie.Id = movieId;
 
+            return await InsertOrUpdateAsync(movie);
+        }
+
+        private async Task<AppResponse<MovieResponse>> InsertOrUpdateAsync(Movie movie)
+        {
             var validationResult = movie.IsValid();
 
             if (!validationResult.Succeeded)
                 return AppResponse<MovieResponse>.Error(validationResult.Messages);
 
-            var result = unitOfWork.MovieRepository.InsertOrUpdate(movie);
+            var registerGenresResult = await this.genreService.RegisterAsync(movie.Genres);
 
-            if (result.Succeeded)
+            if (registerGenresResult.Succeeded)
             {
-                await unitOfWork.CommitAsync();
-                return AppResponse<MovieResponse>.Success(movie.ToMovieResponse());
+                movie.Genres = registerGenresResult.Data;
+                var result = this.unitOfWork.MovieRepository.InsertOrUpdate(movie);
+
+                if (result.Succeeded)
+                {
+                    await this.unitOfWork.CommitAsync();
+                    return AppResponse<MovieResponse>.Success(result.Data.ToMovieResponse());
+                }
+
+                return AppResponse<MovieResponse>.Error(result.Messages);
             }
 
-            return AppResponse<MovieResponse>.Error(result.Messages);
+            return AppResponse<MovieResponse>.Error(registerGenresResult.Messages);
         }
     }
 }

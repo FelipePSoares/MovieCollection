@@ -10,14 +10,17 @@ namespace MovieCollection.Persistence.Repositories
         private bool disposed = false;
         private readonly MovieCollectionDatabaseContext context;
         private readonly Lazy<IGenericRepository<Movie>> movieRepository;
+        private readonly Lazy<IGenericRepository<Genre>> genreRepository;
 
         public UnitOfWork(MovieCollectionDatabaseContext dbContext, ILogger<UnitOfWork> logger)
         {
             this.context = dbContext;
             this.movieRepository = new Lazy<IGenericRepository<Movie>>(() => new GenericRepository<Movie>(this.context, logger));
+            this.genreRepository = new Lazy<IGenericRepository<Genre>>(() => new GenericRepository<Genre>(this.context, logger));
         }
 
         public IGenericRepository<Movie> MovieRepository => this.movieRepository.Value;
+        public IGenericRepository<Genre> GenreRepository => this.genreRepository.Value;
 
         public Task CommitAsync()
         {

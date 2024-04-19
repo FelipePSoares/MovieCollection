@@ -14,7 +14,7 @@ namespace MovieCollection.Domain
         {
             var erroMessages = new List<AppMessage>();
 
-            if (string.IsNullOrEmpty(this.Name))
+            if (string.IsNullOrEmpty(this.Name) && this.Id == default!)
                 erroMessages.Add(new AppMessage(nameof(this.Name), String.Format(ValidationMessages.PropertyCantBeNullOrEmpty, nameof(this.Name))));
 
             if (erroMessages.Any())
