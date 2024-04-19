@@ -1,12 +1,10 @@
 ﻿using System.Net;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
-using MovieCollection.Domain.AccessControl;
-using MovieCollection.Infrastructure;
 
 namespace MovieCollection.Server.Controllers
 {
@@ -91,6 +89,17 @@ namespace MovieCollection.Server.Controllers
         public async Task<IActionResult> SetUserName(UserSetNameRequest userDto)
         {
             var result = await userService.SetUserNameAsync(User, userDto);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpPatch]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> UpdateMovieCollection(JsonPatchDocument<UserMovieCollection> userMovieCollection)
+        {
+            var result = await this.userService.UpdateMovieCollectionAsync(User, userMovieCollection);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

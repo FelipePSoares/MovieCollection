@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MovieCollection.Application.Features;
 using MovieCollection.Domain.AccessControl;
 using MovieCollection.Infrastructure.Authentication;
