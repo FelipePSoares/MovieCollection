@@ -1,2 +1,12 @@
-<p>profile works!</p>
-{{user.firstName}}
+{{user.firstName}}{{user.lastName}}
+@for (movie of user.movieCollection; track movie.id) {
+    <p>
+        {{movie.title}}
+        {{movie.description}}
+        {{movie.duration}}
+        {{movie.releaseYear}}
+        @for (genre of movie.genres; track genre.id){
+            {{genre.name}}
+        }
+    </p>
+}
