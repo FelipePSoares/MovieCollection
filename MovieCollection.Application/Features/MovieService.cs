@@ -92,6 +92,9 @@ namespace MovieCollection.Application.Features
 
             if (registerGenresResult.Succeeded)
             {
+                if (!await this.unitOfWork.MovieRepository.NoTrackable().AnyAsync(m => m.Title == movie.Title))
+                    return AppResponse<MovieResponse>.Error(nameof(movie.Title), ValidationMessages.MovieTitleAlreadyExists);
+
                 movie.Genres = registerGenresResult.Data;
                 var result = this.unitOfWork.MovieRepository.InsertOrUpdate(movie);
 

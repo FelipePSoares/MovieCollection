@@ -123,6 +123,9 @@
   <data name="MovieNotFound" xml:space="preserve">
     <value>Movie not found</value>
   </data>
+  <data name="MovieTitleAlreadyExists" xml:space="preserve">
+    <value>Movie title already exists</value>
+  </data>
   <data name="PropertyCantBeNull" xml:space="preserve">
     <value>{0} can't be null</value>
   </data>
