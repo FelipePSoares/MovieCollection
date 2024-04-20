@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MovieCollection.Application.Contracts.Persistence;
+using MovieCollection.Application.Features.DTOs;
+using MovieCollection.Application.Features.Mappers;
 using MovieCollection.Domain;
 using MovieCollection.Infrastructure.DTOs;
 
@@ -12,6 +14,13 @@ namespace MovieCollection.Application.Features
     public class GenreService(IUnitOfWork unitOfWork) : IGenreService
     {
         private readonly IUnitOfWork unitOfWork = unitOfWork;
+
+        public async Task<AppResponse<List<GenreResponse>>> GetAllAsync()
+        {
+            var genres = await unitOfWork.GenreRepository.NoTrackable().ToListAsync();
+
+            return AppResponse<List<GenreResponse>>.Success(genres.ToGenreResponse());
+        }
 
         public async Task<AppResponse<List<Genre>>> RegisterAsync(List<Genre> genres)
         {

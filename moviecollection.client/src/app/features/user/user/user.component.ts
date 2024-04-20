@@ -12,7 +12,7 @@ import { UserService } from 'src/app/core/services/user.service';
 
 export class UserComponent {
   isLoggedUser: boolean = false;
-  user: User = new User();
+  user!: User;
   
   constructor(private userService: UserService, private router: Router) { }
 
@@ -33,7 +33,7 @@ export class UserComponent {
     this.userService.removeMovieFromCollection(movieId).subscribe();
   }
   
-  addMovie(): void {
+  addMovieToCollection(): void {
     this.router.navigate(['/search-movie']);
   }
 }

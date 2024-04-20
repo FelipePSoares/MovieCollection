@@ -69,7 +69,7 @@ export class UserService {
     return this.updateMovieCollection(patch);
   }
 
-  public addMovieFromCollection(movieId: string): Observable<User> {
+  public addMovieToCollection(movieId: string): Observable<User> {
     var patch = [{
       "op": "add",
       "path": "/MovieCollection/-",

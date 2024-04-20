@@ -57,6 +57,7 @@ namespace MovieCollection.Application.Features
         {
             var movies = await unitOfWork.MovieRepository
                 .NoTrackable()
+                .Include(movie => movie.Genres)
                 .Where(movie => string.IsNullOrEmpty(filter.Title) ? true : movie.Title.Contains(filter.Title, StringComparison.InvariantCultureIgnoreCase))
                 .Where(movie => !filter.Genres.Any() ? true : movie.Genres.Any(genre => filter.Genres.Contains(genre.Id)))
                 .Where(movie => !filter.ReleaseYearStart.HasValue && !filter.ReleaseYearEnd.HasValue ? true : filter.ReleaseYearStart <= movie.ReleaseYear && movie.ReleaseYear <= filter.ReleaseYearEnd)
@@ -92,7 +93,7 @@ namespace MovieCollection.Application.Features
 
             if (registerGenresResult.Succeeded)
             {
-                if (!await this.unitOfWork.MovieRepository.NoTrackable().AnyAsync(m => m.Title == movie.Title))
+                if (await this.unitOfWork.MovieRepository.NoTrackable().AnyAsync(m => m.Title == movie.Title))
                     return AppResponse<MovieResponse>.Error(nameof(movie.Title), ValidationMessages.MovieTitleAlreadyExists);
 
                 movie.Genres = registerGenresResult.Data;
