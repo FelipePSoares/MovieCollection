@@ -14,13 +14,14 @@ export class RegisterComponent implements OnInit{
   registerForm!: FormGroup;
   httpErrors = false;
   errors: IDictionary<string> = {};
+
   constructor(private authService: AuthService, private router: Router) {
     this.authService.isSignedIn$.subscribe(value => {
       if (value) {
         this.router.navigate(['/']);
       }
     });
-}
+  }
 
   ngOnInit(){
     this.buildRegisterForm();

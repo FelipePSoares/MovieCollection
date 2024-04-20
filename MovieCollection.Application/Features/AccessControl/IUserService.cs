@@ -19,6 +19,6 @@ namespace MovieCollection.Application.Features.AccessControl
         Task<AppResponse> RemoveUserAsync(ClaimsPrincipal user);
         Task<AppResponse> BlockUserAsync(Guid userId);
         Task<AppResponse<UserProfileResponse>> UpdateMovieCollectionAsync(ClaimsPrincipal user, JsonPatchDocument<UserMovieCollection> userMovieCollection);
-        Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync();
+        Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user);
     }
 }

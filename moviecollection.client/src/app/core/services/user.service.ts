@@ -21,7 +21,7 @@ export class UserService {
   }
 
   public refreshUserInfo(): Observable<User> {
-    return this.http.get<User>('/api/user/', {
+    return this.http.get<User>('/api/users/profile', {
       observe: 'body',
       responseType: 'json'
     }).pipe(map(user => {
@@ -37,11 +37,25 @@ export class UserService {
   }
 
   public setUserInfo(firstName: string, lastName: string): Observable<User> {
-    return this.http.put('/api/user/', {
+    return this.http.put('/api/users/', {
       firstName: firstName,
       lastName: lastName
     }).pipe(concatMap(res => {
       return this.refreshUserInfo();
     }));
+  }
+  
+  public getUsers(): Observable<User[]> {
+    return this.http.get<User[]>('/api/users/', {
+      observe: 'body',
+      responseType: 'json'
+    });
+  }
+  
+  public getUserById(userId: string): Observable<User> {
+    return this.http.get<User>('/api/users/' + userId, {
+      observe: 'body',
+      responseType: 'json'
+    });
   }
 }

@@ -10,7 +10,7 @@ namespace MovieCollection.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class MovieController(IMovieService movieService) : BaseController
+    public class MoviesController(IMovieService movieService) : BaseController
     {
         private readonly IMovieService movieService = movieService;
 

@@ -1,45 +1,40 @@
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NavBarComponent } from '../core/components/nav-bar/nav-bar.component';
-import { HttpRequestInterceptor } from '../core/interceptor/http-request-interceptor';
 import { LoginComponent } from './authentication/login/login.component';
 import { RegisterComponent } from './authentication/register/register.component';
 import { LogoutComponent } from './authentication/logout/logout.component';
 import { FirstSignInComponent } from './authentication/first-sign-in/first-sign-in.component';
 import { SpinnerComponent } from '../core/components/spinner/spinner.component';
-import { LoadingInterceptor } from '../core/interceptor/loading.interceptor';
-import { ProfileComponent } from './user/profile/profile.component';
+import { UserComponent } from './user/user/user.component';
+import { ListUsersComponent } from './user/list-users/list-users.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
-    AppComponent,
     LoginComponent,
-    NavBarComponent,
     RegisterComponent,
     LogoutComponent,
     FirstSignInComponent,
-    SpinnerComponent,
-    ProfileComponent
   ],
   imports: [
+    NavBarComponent,
+    SpinnerComponent,
+    AppComponent,
     BrowserModule,
     HttpClientModule,
-    AppRoutingModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    RouterModule,
+    UserComponent,
+    ListUsersComponent
   ],
-  providers: [
-    [
-      { provide: HTTP_INTERCEPTORS, useClass: HttpRequestInterceptor, multi: true },
-      { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
-    ]
-  ],
-  bootstrap: [AppComponent]
+  providers: [],
+  bootstrap: []
 })
 export class AppModule { }
