@@ -7,6 +7,7 @@ import { LogoutComponent } from './authentication/logout/logout.component';
 import { FirstSignInComponent } from './authentication/first-sign-in/first-sign-in.component';
 import { UserComponent } from './user/user/user.component';
 import { ListUsersComponent } from './user/list-users/list-users.component';
+import { SearchMovieComponent } from './movie/search-movie/search-movie.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'users', pathMatch: 'full' },
@@ -14,6 +15,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'logout', component: LogoutComponent, canActivate: mapToCanActivate([AuthGuard]) },
   { path: 'first-signin', component: FirstSignInComponent, canActivate: mapToCanActivate([AuthGuard]) },
+  { path: 'profile', component: UserComponent, canActivate: mapToCanActivate([AuthGuard, FirstSignInGuard]) },
   { path: 'users', component: ListUsersComponent, canActivate: mapToCanActivate([AuthGuard, FirstSignInGuard]) },
-  { path: 'users/:id', component: UserComponent, canActivate: mapToCanActivate([AuthGuard, FirstSignInGuard]) }
+  { path: 'users/:id', component: UserComponent, canActivate: mapToCanActivate([AuthGuard, FirstSignInGuard]) },
+  { path: 'search-movie', component: SearchMovieComponent, canActivate: mapToCanActivate([AuthGuard, FirstSignInGuard]) }
 ];

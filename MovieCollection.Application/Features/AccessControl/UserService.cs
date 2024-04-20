@@ -126,7 +126,7 @@ namespace MovieCollection.Application.Features.AccessControl
             var adminUsers = await this.userManager.GetUsersInRoleAsync("Administrator");
 
             var users = await this.userManager.Users
-                .Where(user => !user.HasIncompletedInformation)
+                .Where(user => !user.HasIncompletedInformation && user.Enabled)
                 .Where(user => !adminUsers.Select(a => a.Id).Contains(user.Id))
                 .Where(user => string.IsNullOrEmpty(userId) ? true : user.Id != new Guid(userId))
                 .ToListAsync();

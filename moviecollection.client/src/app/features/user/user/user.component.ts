@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { User } from 'src/app/core/models/User';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -10,13 +11,29 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 
 export class UserComponent {
+  isLoggedUser: boolean = false;
   user: User = new User();
   
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private router: Router) { }
 
   @Input() 
   set id(id: string) {
-    this.userService.getUserById(id)
-      .subscribe(res => this.user = res);
+    if (id != undefined){
+      this.userService.getUserById(id)
+        .subscribe(res => this.user = res);
+      this.isLoggedUser = false;
+    } else {
+      this.userService.loggedUser$
+        .subscribe(res => this.user = res);
+      this.isLoggedUser = true;
+    }
+  }
+
+  removeMovieFromCollection(movieId: string){
+    this.userService.removeMovieFromCollection(movieId).subscribe();
+  }
+  
+  addMovie(): void {
+    this.router.navigate(['/search-movie']);
   }
 }

@@ -1,12 +1,25 @@
-{{user.firstName}}{{user.lastName}}
-@for (movie of user.movieCollection; track movie.id) {
-    <p>
-        {{movie.title}}
-        {{movie.description}}
-        {{movie.duration}}
-        {{movie.releaseYear}}
-        @for (genre of movie.genres; track genre.id){
-            {{genre.name}}
+<div class="container">
+  <h1 class="text-center mt-5">{{user.firstName}} {{user.lastName}}</h1>
+  <div class="row movies-list justify-content-center">
+    @for (movie of user.movieCollection; track movie.id) {
+        <p>
+            {{movie.title}}
+            {{movie.description}}
+            {{movie.duration}}
+            {{movie.releaseYear}}
+            @for (genre of movie.genres; track genre.id){
+                {{genre.name}}
+            }
+        </p>
+        @if(isLoggedUser) {
+            <div class="btn-group">
+                <button class="btn btn-secondary">Edit</button>
+                <button class="btn btn-danger" (click)="removeMovieFromCollection(movie.id)">Remove</button>
+            </div>
         }
-    </p>
-}
+    }
+  </div>
+  @if(isLoggedUser) {
+    <a class="btn btn-primary btn-add" (click)="addMovie()">+</a>
+  }
+</div>

@@ -58,4 +58,33 @@ export class UserService {
       responseType: 'json'
     });
   }
+
+  public removeMovieFromCollection(movieId: string): Observable<User> {
+    var patch = [{
+      "op": "remove",
+      "path": "/MovieCollection/-",
+      "value": { "id": movieId }
+    }];
+
+    return this.updateMovieCollection(patch);
+  }
+
+  public addMovieFromCollection(movieId: string): Observable<User> {
+    var patch = [{
+      "op": "add",
+      "path": "/MovieCollection/-",
+      "value": { "id": movieId }
+    }];
+
+    return this.updateMovieCollection(patch);
+  }
+  
+  private updateMovieCollection(patch: object): Observable<User>{
+    return this.http.patch<User>('/api/users', patch)
+      .pipe(map(user => {
+        this.loggedUser.next(user);
+        localStorage.setItem(USER_DATA, JSON.stringify(user));
+        return user;
+      }));
+  }
 }
