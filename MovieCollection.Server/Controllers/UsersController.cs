@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
@@ -71,6 +70,28 @@ namespace MovieCollection.Server.Controllers
             return ValidateResponse(result, HttpStatusCode.OK);
         }
 
+        [HttpPut("Profile/AddMovie/{movieId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> AddMovieToCollection(Guid movieId)
+        {
+            var result = await this.userService.AddMovieToCollectionAsync(User, movieId);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
+        [HttpPut("Profile/RemoveMovie/{movieId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> RemoveMovieToCollection(Guid movieId)
+        {
+            var result = await this.userService.RemoveMovieFromCollectionAsync(User, movieId);
+
+            return ValidateResponse(result, HttpStatusCode.OK);
+        }
+
         [HttpGet]
         [ProducesResponseType(typeof(List<UserProfileResponse>), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
@@ -100,17 +121,6 @@ namespace MovieCollection.Server.Controllers
         public async Task<IActionResult> SetUserName(UserSetNameRequest userDto)
         {
             var result = await userService.SetUserNameAsync(User, userDto);
-
-            return ValidateResponse(result, HttpStatusCode.OK);
-        }
-
-        [HttpPatch]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
-        [ProducesResponseType(401)]
-        public async Task<IActionResult> UpdateMovieCollection(JsonPatchDocument<UserMovieCollection> userMovieCollection)
-        {
-            var result = await this.userService.UpdateMovieCollectionAsync(User, userMovieCollection);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

@@ -11,7 +11,7 @@ import { SearchMovieComponent } from './movie/search-movie/search-movie.componen
 import { AddMovieComponent } from './movie/add-movie/add-movie.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'users', pathMatch: 'full' },
+  { path: '', redirectTo: 'profile', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'logout', component: LogoutComponent, canActivate: mapToCanActivate([AuthGuard]) },
