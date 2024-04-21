@@ -20,7 +20,7 @@ export class AuthService {
   }
 
   public signIn(email: string, password: string): Observable<User> {
-    return this.http.post<Token>('/api/user/login', {
+    return this.http.post<Token>('/api/users/login', {
       email: email,
       password: password
     }, {
@@ -34,13 +34,16 @@ export class AuthService {
   public signOut(): Observable<boolean> {
     this.userService.removeUserInfo();
 
-    return this.http.post('/api/user/logout', null, {
+    return this.http.post('/api/users/logout', null, {
       observe: 'response'
-    }).pipe<boolean>(map(res => res.ok));
+    }).pipe<boolean>(map(res => {
+      localStorage.removeItem(TOKEN_DATA);
+      return res.ok;
+    }));
   }
 
   public register(email: string, password: string): Observable<boolean> {
-    return this.http.post('/api/user/register', {
+    return this.http.post('/api/users/register', {
       email: email,
       password: password
     }, {

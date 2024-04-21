@@ -79,6 +79,15 @@ namespace MovieCollection.Infrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Movie title already exists.
+        /// </summary>
+        public static string MovieTitleAlreadyExists {
+            get {
+                return ResourceManager.GetString("MovieTitleAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} can&apos;t be null.
         /// </summary>
         public static string PropertyCantBeNull {

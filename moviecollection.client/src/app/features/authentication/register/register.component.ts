@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { IDictionary } from '../../../core/interfaces/IDictionary';
 import { AuthService } from '../../../core/services/auth.service';
 import { passwordMatchValidator } from '../../../core/utils/custom-validators/password-match-validator';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -14,13 +17,14 @@ export class RegisterComponent implements OnInit{
   registerForm!: FormGroup;
   httpErrors = false;
   errors: IDictionary<string> = {};
+
   constructor(private authService: AuthService, private router: Router) {
     this.authService.isSignedIn$.subscribe(value => {
       if (value) {
         this.router.navigate(['/']);
       }
     });
-}
+  }
 
   ngOnInit(){
     this.buildRegisterForm();

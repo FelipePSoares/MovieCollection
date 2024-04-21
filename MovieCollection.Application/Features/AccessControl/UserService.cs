@@ -119,12 +119,16 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
 
-        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync()
+        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user)
         {
+            var userId = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+
             var adminUsers = await this.userManager.GetUsersInRoleAsync("Administrator");
 
             var users = await this.userManager.Users
+                .Where(user => !user.HasIncompletedInformation && user.Enabled)
                 .Where(user => !adminUsers.Select(a => a.Id).Contains(user.Id))
+                .Where(user => string.IsNullOrEmpty(userId) ? true : user.Id != new Guid(userId))
                 .ToListAsync();
 
             return AppResponse<List<UserProfileResponse>>.Success(users.ToUserProfileResponse());

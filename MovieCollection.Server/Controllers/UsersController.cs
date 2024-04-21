@@ -5,13 +5,12 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
-using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController(IUserService userService) : BaseController
+    public class UsersController(IUserService userService) : BaseController
     {
         private readonly IUserService userService = userService;
 
@@ -78,7 +77,7 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetAll()
         {
-            var result = await userService.GetAllUsersAsync();
+            var result = await userService.GetAllUsersAsync(User);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

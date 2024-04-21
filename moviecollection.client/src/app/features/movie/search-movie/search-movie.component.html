@@ -1,0 +1,38 @@
+<div class="container">
+    <h1 class="text-center mt-5">Search Movies</h1>
+    <div class="input justify-content-center">
+        <div class="col-md-4 mb-2 form-floating">
+            <input type="text" class="form-control" [formControl]="titleControl" id="title" placeholder="Movie title">
+            <label for="name">Movie title</label>
+        </div>
+    </div>
+    <div>
+        @for (movie of (searchResults$ | async); track movie.id){
+            <div class="list-group-item user-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ movie.title }}</h5>
+                        {{ movie.description }}
+                        {{ movie.duration }}
+                        {{ movie.releaseYear }}
+                        @for (genre of movie.genres; track genre.id){
+                            {{genre.name}}
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (movieAlreadyAddedToUserCollection(movie.id)){
+                <button class="btn btn-danger" (click)="removeMovieFromCollection(movie.id)">Remove</button>
+            }
+            @else {
+                <button class="btn btn-primary" (click)="addMovieToCollection(movie.id)">Add</button>
+            }
+        }
+        @empty {
+            <div class="text-center">
+                Is your movie not here yet? 
+                <a [routerLink]="['/add-movie']">Add clicking here.</a>
+            </div>
+        }
+    </div>
+</div>
