@@ -1,68 +1,71 @@
 <div class="container">
-    <h1 class="text-center mt-5">Create Project</h1>
-    <form [formGroup]="movieForm" (ngSubmit)="saveMovie()">
-        <div class="input justify-content-center">
-          <div class="col-md-4 mb-2 form-floating">
-            <input type="text" class="form-control" id="title" formControlName="title" [class.is-invalid]="title?.invalid && title?.touched">
-            <label for="title">Movie Title</label>
-            <div *ngIf="title?.invalid && title?.touched">
-              <div *ngIf="title?.errors?.['required']" class="text-danger">Movie title is required.</div>
+  <h1 class="text-center mt-5">Create Project</h1>
+  <div class="row justify-content-center">
+    <div class="add-movie col-md-8">
+      <form [formGroup]="movieForm" class="formAddMovie" (ngSubmit)="saveMovie()">
+          <div class="input justify-content-center">
+            <div class="col-md-12 mb-2 form-floating">
+              <input type="text" class="form-control" id="title" formControlName="title" [class.is-invalid]="title?.invalid && title?.touched">
+              <label for="title">Movie Title</label>
+              <div *ngIf="title?.invalid && title?.touched">
+                <div *ngIf="title?.errors?.['required']" class="text-danger">Movie title is required.</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="input justify-content-center">
-          <div class="col-md-4 mb-2 form-floating">
-            <input type="text" class="form-control" id="description" formControlName="description">
-            <label for="description">Description</label>
-          </div>
-        </div>
-        <div class="input justify-content-center">
-          <div class="col-md-4 mb-2 form-floating">
-            <input type="text" class="form-control" id="ReleaseYear" formControlName="ReleaseYear">
-            <label for="ReleaseYear">Release Year</label>
-          </div>
-        </div>
-        <div class="input justify-content-center">
-          <div class="col-md-4 mb-2 form-floating">
-            <input type="text" class="form-control" id="Duration" formControlName="Duration">
-            <label for="Duration">Duration</label>
-          </div>
-        </div>
-        <div class="input justify-content-center">
-          <div class="col-md-4 mb-2">
-            <mat-form-field class="genre-list">
-              <mat-label>Genres</mat-label>
-              <mat-chip-grid #chipGrid aria-label="Genre selection">
-                @for (genre of genres; track genre) {
-                  <mat-chip-row (removed)="remove(genre)">
-                    {{genre}}
-                    <button matChipRemove [attr.aria-label]="'remove ' + genre">
-                      <mat-icon>cancel</mat-icon>
-                    </button>
-                  </mat-chip-row>
-                }
-              </mat-chip-grid>
-              <input placeholder="New Genre..." #genreInput formControlName="Genres"
-                [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
-                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                (matChipInputTokenEnd)="add($event)"/>
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                @for (genre of filteredGenres$ | async; track genre) {
-                  <mat-option [value]="genre">{{genre}}</mat-option>
-                }
-              </mat-autocomplete>
-            </mat-form-field>  
-          </div>
-        </div>
-
-        <div class="input justify-content-center">
-            <div class="col-md-4 mb-2">
-            <button type="submit" class="btn btn-primary" [disabled]="movieForm.invalid">Create</button>
+          <div class="input justify-content-center">
+            <div class="col-md-12 mb-2 form-floating">
+              <input type="text" class="form-control" id="description" formControlName="description">
+              <label for="description">Description</label>
             </div>
-            <div *ngIf="httpErrors">
-            <p class="mt-5 mb-3 text-danger text-center">{{errors | json}}</p>
+          </div>
+          <div class="input justify-content-center">
+            <div class="col-md-12 mb-2 form-floating">
+              <input type="text" class="form-control" id="ReleaseYear" formControlName="ReleaseYear">
+              <label for="ReleaseYear">Release Year</label>
             </div>
-        </div>
-    </form>
+          </div>
+          <div class="input justify-content-center">
+            <div class="col-md-12 mb-2 form-floating">
+              <input type="text" class="form-control" id="Duration" formControlName="Duration">
+              <label for="Duration">Duration</label>
+            </div>
+          </div>
+          <div class="input justify-content-center">
+            <div class="col-md-12 mb-2">
+              <mat-form-field class="genre-list">
+                <mat-label>Genres</mat-label>
+                <mat-chip-grid #chipGrid aria-label="Genre selection">
+                  @for (genre of genres; track genre) {
+                    <mat-chip-row (removed)="remove(genre)">
+                      {{genre}}
+                      <button matChipRemove [attr.aria-label]="'remove ' + genre">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    </mat-chip-row>
+                  }
+                </mat-chip-grid>
+                <input placeholder="New Genre..." #genreInput formControlName="Genres"
+                  [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  (matChipInputTokenEnd)="add($event)"/>
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                  @for (genre of filteredGenres$ | async; track genre) {
+                    <mat-option [value]="genre">{{genre}}</mat-option>
+                  }
+                </mat-autocomplete>
+              </mat-form-field>  
+            </div>
+          </div>
+          <div class="input justify-content-center">
+              <div class="col-md-12 mb-2">
+                <button type="submit" class="btn btn-primary" [disabled]="movieForm.invalid">Create</button>
+              </div>
+              <div *ngIf="httpErrors">
+              <p class="mt-5 mb-3 text-danger text-center">{{errors | json}}</p>
+              </div>
+          </div>
+      </form>
+    </div>
   </div>
+</div>
   

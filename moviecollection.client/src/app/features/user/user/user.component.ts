@@ -48,6 +48,9 @@ export class UserComponent {
   }
 
   mapMovieToDto(movies: Movie[]): MovieCardDto[]{
+    if (movies == undefined)
+      return <MovieCardDto[]>[];
+
     return movies.map((movie: Movie) => {
       var movieDto = new MovieCardDto();
       movieDto.id = movie.id;
