@@ -6,14 +6,19 @@ import { routes } from './app-routing.module';
 import { NavBarComponent } from '../core/components/nav-bar/nav-bar.component';
 import { SpinnerComponent } from '../core/components/spinner/spinner.component';
 import { CommonModule } from '@angular/common';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpRequestInterceptor } from '../core/interceptor/http-request-interceptor';
 import { LoadingInterceptor } from '../core/interceptor/loading.interceptor';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavBarComponent, SpinnerComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    NavBarComponent,
+    SpinnerComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -27,6 +32,7 @@ export class AppComponent implements OnInit {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideAnimations(),
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(
       withInterceptors([HttpRequestInterceptor, LoadingInterceptor]))],

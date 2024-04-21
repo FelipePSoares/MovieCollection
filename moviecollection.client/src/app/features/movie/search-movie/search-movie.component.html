@@ -15,7 +15,6 @@
                         {{ movie.description }}
                         {{ movie.duration }}
                         {{ movie.releaseYear }}
-                        {{ movie.genres }}
                         @for (genre of movie.genres; track genre.id){
                             {{genre.name}}
                         }
