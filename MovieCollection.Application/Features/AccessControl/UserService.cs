@@ -119,8 +119,11 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
 
-        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user, Paging paging)
+        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user, Paging paging = default!)
         {
+            if (paging == default)
+                paging = new Paging();
+
             var userId = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
             var adminUsers = await this.userManager.GetUsersInRoleAsync("Administrator");

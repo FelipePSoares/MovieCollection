@@ -53,8 +53,11 @@ namespace MovieCollection.Application.Features
             return result;
         }
 
-        public async Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter, Paging paging)
+        public async Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter, Paging paging = default!)
         {
+            if (paging == default)
+                paging = new Paging();
+
             var movies = await unitOfWork.MovieRepository
                 .NoTrackable()
                 .Include(movie => movie.Genres)
