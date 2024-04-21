@@ -39,12 +39,13 @@ export class SearchMovieComponent implements OnInit {
       .subscribe(res => this.user = res);
   }
 
-  movieAlreadyAddedToUserCollection(movieId: string) : boolean{
+  movieAlreadyAddedToUserCollection(movieId: string) : boolean {
     return this.user.movieCollection.find(m => m.id == movieId) != undefined;
   }
 
-  removeMovieFromCollection(movieId: string){
-    this.userService.removeMovieFromCollection(movieId).subscribe();
+  removeMovieFromCollection(movieId: string) {
+    var index = this.user.movieCollection.findIndex(m => m.id == movieId);
+    this.userService.removeMovieFromCollection(index).subscribe(u => this.user = u);
   }
   
   addMovieToCollection(movieId: string): void {

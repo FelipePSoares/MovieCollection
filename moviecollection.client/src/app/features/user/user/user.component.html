@@ -12,7 +12,7 @@
             }
         </p>
         @if(isLoggedUser) {
-          <button class="btn btn-danger" (click)="removeMovieFromCollection(movie.id)">Remove</button>
+          <button class="btn btn-danger" (click)="removeMovieFromCollection($index)">Remove</button>
         }
     }
   </div>

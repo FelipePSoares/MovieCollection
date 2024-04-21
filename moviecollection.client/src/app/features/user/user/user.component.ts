@@ -29,11 +29,11 @@ export class UserComponent {
     }
   }
 
-  removeMovieFromCollection(movieId: string){
-    this.userService.removeMovieFromCollection(movieId).subscribe();
+  removeMovieFromCollection(index: number){
+    this.userService.removeMovieFromCollection(index).subscribe();
   }
   
   addMovieToCollection(): void {
-    this.router.navigate(['/search-movie']);
+    this.router.navigate(['search-movie']);
   }
 }

@@ -59,11 +59,10 @@ export class UserService {
     });
   }
 
-  public removeMovieFromCollection(movieId: string): Observable<User> {
+  public removeMovieFromCollection(index: number): Observable<User> {
     var patch = [{
       "op": "remove",
-      "path": "/MovieCollection/-",
-      "value": { "id": movieId }
+      "path": "/MovieCollection/" + index
     }];
 
     return this.updateMovieCollection(patch);
