@@ -1,22 +1,23 @@
 <div class="container">
   <h1 class="text-center mt-5">{{user.firstName}} {{user.lastName}}</h1>
-  <div class="row movies-list justify-content-center">
-    @for (movie of user.movieCollection; track movie.id) {
-        <p>
-            {{movie.title}}
-            {{movie.description}}
-            {{movie.duration}}
-            {{movie.releaseYear}}
-            @for (genre of movie.genres; track genre.id){
-                {{genre.name}}
-            }
-        </p>
-        @if(isLoggedUser) {
-          <button class="btn btn-danger" (click)="removeMovieFromCollection($index)">Remove</button>
+  <div class="row justify-content-center">
+    <div class="movies-list col-md-8">
+      <ul class="list-group">
+        @for (movie of movies; track movie.id) {
+          <li class="list-group-item">
+            <app-movie-card 
+              [movie]="movie" 
+              [isLoggedUser]="isLoggedUser" 
+              (onRemove)="removeMovieFromCollection(movie.id)">
+            </app-movie-card>
+          </li>
         }
-    }
+      </ul>
+    </div>
   </div>
   @if(isLoggedUser) {
-    <a class="btn btn-primary btn-add" (click)="addMovieToCollection()">+</a>
+    <a class="btn btn-primary btn-add" (click)="addMovieToCollection()">
+      <fa-icon [icon]="faPlus"></fa-icon>
+    </a>
   }
 </div>

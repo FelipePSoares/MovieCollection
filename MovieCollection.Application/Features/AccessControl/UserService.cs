@@ -109,7 +109,7 @@ namespace MovieCollection.Application.Features.AccessControl
         public async Task<AppResponse<UserProfileResponse>> GetUserByIdAsync(Guid id)
         {
             var user = await this.userManager.Users
-                .Include(user => user.MovieCollection)
+                .Include(user => user.MovieCollection.OrderBy(m => m.Title))
                     .ThenInclude(movie => movie.Genres)
                 .FirstOrDefaultAsync(user => user.Id == id);
 
@@ -154,7 +154,7 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserProfileResponse>.Error(GetRegisterErrors(result));
         }
 
-        public async Task<AppResponse<UserProfileResponse>> UpdateMovieCollectionAsync(ClaimsPrincipal userLogged, JsonPatchDocument<UserMovieCollection> userMovieCollection)
+        public async Task<AppResponse<UserProfileResponse>> AddMovieToCollectionAsync(ClaimsPrincipal userLogged, Guid movieId)
         {
             var userId = new Guid(userLogged.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
             var user = await this.userManager.Users.Include(u => u.MovieCollection).FirstOrDefaultAsync(u => u.Id == userId);
@@ -162,11 +162,35 @@ namespace MovieCollection.Application.Features.AccessControl
             if (user == null)
                 return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
 
-            var userRequest = user.ToUserMovieCollection();
+            var movieToAdd = await this.unitOfWork.MovieRepository.Trackable().FirstOrDefaultAsync(movie => movie.Id == movieId);
 
-            userMovieCollection.ApplyTo(userRequest);
-            user.MovieCollection = await this.unitOfWork.MovieRepository.Trackable()
-                .Where(movie => userRequest.MovieCollection.Select(m => m.Id).Contains(movie.Id)).ToListAsync();
+            if (movieToAdd == null)
+                return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.MovieNotFound);
+
+            user.MovieCollection.Add(movieToAdd);
+
+            var result = await this.userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+                return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+
+            return AppResponse<UserProfileResponse>.Error(GetRegisterErrors(result));
+        }
+
+        public async Task<AppResponse<UserProfileResponse>> RemoveMovieFromCollectionAsync(ClaimsPrincipal userLogged, Guid movieId)
+        {
+            var userId = new Guid(userLogged.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
+            var user = await this.userManager.Users.Include(u => u.MovieCollection).FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return AppResponse<UserProfileResponse>.Error(MessageKey.NotFound, ValidationMessages.UserNotFound);
+
+            var movieToRemove = user.MovieCollection.FirstOrDefault(m => m.Id == movieId);
+
+            if (movieToRemove == null)
+                return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
+
+            user.MovieCollection.Remove(movieToRemove);
 
             var result = await this.userManager.UpdateAsync(user);
 

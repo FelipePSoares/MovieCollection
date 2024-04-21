@@ -1,0 +1,27 @@
+<div class="movie-card">
+    <div class="movie-title">
+        <h1>{{movie.title}}</h1>
+        @if(isLoggedUser && movie.onUserCollection) {
+            <button class="btn btn-danger" (click)="remove()">
+                <fa-icon [icon]="faMinus"></fa-icon>
+            </button>
+        }
+        @else if (isLoggedUser && !movie.onUserCollection) {
+            <button class="btn btn-primary" (click)="add()">
+                <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
+        }
+    </div>
+    <ul class="inlineList">
+        <li class="inlineListItem">{{movie.releaseYear}}</li>
+        <li class="inlineListItem">{{formatDuration(movie.duration).hours}}h {{formatDuration(movie.duration).minutes}}m</li>
+        @for (genre of movie.genres; track genre.id){
+            <li class="inlineListItem">
+                {{genre.name}}
+            </li>
+        }
+    </ul>
+    <p>    
+        {{movie.description}}
+    </p>
+</div>

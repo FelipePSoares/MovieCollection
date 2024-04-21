@@ -1,6 +1,6 @@
 <div class="container">
     <h1 class="text-center mt-5">Users</h1>
-    <div class="user-list justify-content-center">
+    <div class="user-list">
         <div class="cardList">
             @for (user of (users$ | async); track user.id){
                 <app-user-card [user]="user" class="cardListItem"></app-user-card>

@@ -59,27 +59,17 @@ export class UserService {
     });
   }
 
-  public removeMovieFromCollection(index: number): Observable<User> {
-    var patch = [{
-      "op": "remove",
-      "path": "/MovieCollection/" + index
-    }];
-
-    return this.updateMovieCollection(patch);
+  public removeMovieFromCollection(movieId: string): Observable<User> {
+    return this.http.put<User>('/api/users/profile/removeMovie/'+movieId, null,)
+      .pipe(map(user => {
+        this.loggedUser.next(user);
+        localStorage.setItem(USER_DATA, JSON.stringify(user));
+        return user;
+      }));
   }
 
   public addMovieToCollection(movieId: string): Observable<User> {
-    var patch = [{
-      "op": "add",
-      "path": "/MovieCollection/-",
-      "value": { "id": movieId }
-    }];
-
-    return this.updateMovieCollection(patch);
-  }
-  
-  private updateMovieCollection(patch: object): Observable<User>{
-    return this.http.patch<User>('/api/users', patch)
+    return this.http.put<User>('/api/users/profile/addMovie/'+movieId, null,)
       .pipe(map(user => {
         this.loggedUser.next(user);
         localStorage.setItem(USER_DATA, JSON.stringify(user));

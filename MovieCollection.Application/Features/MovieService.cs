@@ -61,6 +61,7 @@ namespace MovieCollection.Application.Features
                 .Where(movie => string.IsNullOrEmpty(filter.Title) ? true : movie.Title.Contains(filter.Title, StringComparison.InvariantCultureIgnoreCase))
                 .Where(movie => !filter.Genres.Any() ? true : movie.Genres.Any(genre => filter.Genres.Contains(genre.Id)))
                 .Where(movie => !filter.ReleaseYearStart.HasValue && !filter.ReleaseYearEnd.HasValue ? true : filter.ReleaseYearStart <= movie.ReleaseYear && movie.ReleaseYear <= filter.ReleaseYearEnd)
+                .OrderBy(m => m.Title)
                 .ToListAsync();
 
             return AppResponse<List<MovieResponse>>.Success(movies.ToMovieResponse());
