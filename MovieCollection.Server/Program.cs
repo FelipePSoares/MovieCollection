@@ -68,11 +68,17 @@ if (app.Environment.IsDevelopment())
         var genreDrama = new Genre() { Name = "Drama" };
         var genreSciFi = new Genre() { Name = "Sci-Fi" };
         var genreRomance = new Genre() { Name = "Romance" };
+        var genreAction = new Genre() { Name = "Action" };
+        var genreThriller = new Genre() { Name = "Thriller" };
+        var genreCrime = new Genre() { Name = "Crime" };
 
         unitOfWork.GenreRepository.InsertOrUpdate(genreAdventure);
         unitOfWork.GenreRepository.InsertOrUpdate(genreDrama);
         unitOfWork.GenreRepository.InsertOrUpdate(genreSciFi);
         unitOfWork.GenreRepository.InsertOrUpdate(genreRomance);
+        unitOfWork.GenreRepository.InsertOrUpdate(genreAction);
+        unitOfWork.GenreRepository.InsertOrUpdate(genreThriller);
+        unitOfWork.GenreRepository.InsertOrUpdate(genreCrime);
 
         var movieTheMartian = new Movie()
         {
@@ -103,6 +109,26 @@ if (app.Environment.IsDevelopment())
             Genres = new List<Genre>() { genreDrama, genreRomance }
         };
         unitOfWork.MovieRepository.InsertOrUpdate(movieTitanic);
+
+        var movieJohnWick = new Movie()
+        {
+            Title = "John Wick",
+            Description = "An ex-hitman comes out of retirement to track down the gangsters who killed his dog and stole his car.",
+            ReleaseYear = 2014,
+            Duration = new TimeSpan(1, 41, 0),
+            Genres = new List<Genre>() { genreAction, genreThriller, genreCrime }
+        };
+        unitOfWork.MovieRepository.InsertOrUpdate(movieJohnWick);
+
+        var movieDieHard = new Movie()
+        {
+            Title = "Die Hard",
+            Description = "A New York City police officer tries to save his estranged wife and several others taken hostage by terrorists during a Christmas party at the Nakatomi Plaza in Los Angeles.",
+            ReleaseYear = 1988,
+            Duration = new TimeSpan(2, 12, 0),
+            Genres = new List<Genre>() { genreAction, genreThriller }
+        };
+        unitOfWork.MovieRepository.InsertOrUpdate(movieDieHard);
 
         unitOfWork.CommitAsync().GetAwaiter().GetResult();
 
@@ -148,6 +174,28 @@ if (app.Environment.IsDevelopment())
             MovieCollection = new List<Movie>() { movieTitanic }
         };
         userManager.CreateAsync(user2, "Passw0rd!").GetAwaiter().GetResult();
+
+        var user3 = new User()
+        {
+            UserName = "user@user.com",
+            Email = "user@user.com",
+            FirstName = "John",
+            LastName = "Wick",
+            HasIncompletedInformation = false,
+            MovieCollection = new List<Movie>() { movieJohnWick }
+        };
+        userManager.CreateAsync(user3, "Passw0rd!").GetAwaiter().GetResult();
+
+        var user4 = new User()
+        {
+            UserName = "john@user.com",
+            Email = "john@user.com",
+            FirstName = "John",
+            LastName = "McClane",
+            HasIncompletedInformation = false,
+            MovieCollection = new List<Movie>() { movieDieHard }
+        };
+        userManager.CreateAsync(user4, "Passw0rd!").GetAwaiter().GetResult();
     }
 }
 else

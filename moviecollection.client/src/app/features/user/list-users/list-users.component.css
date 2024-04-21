@@ -2,6 +2,20 @@
     margin-top: 30px;
 }
 
-.container {
-    position: relative;
+.cardList {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cardList > * {
+    box-sizing: border-box;
+  }
+  .cardList > * {
+    padding: 0 16px 0 16px;
+  }
+
+.cardListItem {
+    flex: 0 1 calc(20% - 32px);
 }
