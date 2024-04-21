@@ -18,7 +18,7 @@ namespace MovieCollection.Application.Features.AccessControl
         Task<AppResponse<UserProfileResponse>> SetUserNameAsync(ClaimsPrincipal userLogged, UserSetNameRequest userDto);
         Task<AppResponse> RemoveUserAsync(ClaimsPrincipal user);
         Task<AppResponse> BlockUserAsync(Guid userId);
-        Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user);
+        Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user, Paging paging);
         Task<AppResponse<UserProfileResponse>> AddMovieToCollectionAsync(ClaimsPrincipal userLogged, Guid movieId);
         Task<AppResponse<UserProfileResponse>> RemoveMovieFromCollectionAsync(ClaimsPrincipal userLogged, Guid movieId);
     }

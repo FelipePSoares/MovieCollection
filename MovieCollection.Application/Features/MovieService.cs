@@ -53,7 +53,7 @@ namespace MovieCollection.Application.Features
             return result;
         }
 
-        public async Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter)
+        public async Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter, Paging paging)
         {
             var movies = await unitOfWork.MovieRepository
                 .NoTrackable()
@@ -62,6 +62,7 @@ namespace MovieCollection.Application.Features
                 .Where(movie => !filter.Genres.Any() ? true : movie.Genres.Any(genre => filter.Genres.Contains(genre.Id)))
                 .Where(movie => !filter.ReleaseYearStart.HasValue && !filter.ReleaseYearEnd.HasValue ? true : filter.ReleaseYearStart <= movie.ReleaseYear && movie.ReleaseYear <= filter.ReleaseYearEnd)
                 .OrderBy(m => m.Title)
+                .Skip(paging.PageNumber * paging.PageSize).Take(paging.PageSize)
                 .ToListAsync();
 
             return AppResponse<List<MovieResponse>>.Success(movies.ToMovieResponse());

@@ -9,7 +9,7 @@ namespace MovieCollection.Application.Features
 {
     public interface IMovieService
     {
-        Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter);
+        Task<AppResponse<List<MovieResponse>>> SearchAsync(MovieFilters filter, Paging paging);
         Task<AppResponse<MovieResponse>> GetByIdAsync(Guid movieId);
         Task<AppResponse<MovieResponse>> RegisterAsync(MovieRequest req);
         Task<AppResponse<MovieResponse>> UpdateAsync(Guid movieId, JsonPatchDocument<MovieRequest> movieDto);

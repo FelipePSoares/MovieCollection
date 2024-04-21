@@ -18,9 +18,9 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(typeof(List<MovieResponse>), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> Get([FromQuery] MovieFilters filter)
+        public async Task<IActionResult> Get([FromQuery] MovieFilters filter, [FromQuery] Paging paging)
         {
-            AppResponse<List<MovieResponse>> result = await this.movieService.SearchAsync(filter);
+            AppResponse<List<MovieResponse>> result = await this.movieService.SearchAsync(filter, paging);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieCollection.Application.Features.AccessControl;
 using MovieCollection.Application.Features.AccessControl.DTOs;
+using MovieCollection.Infrastructure.DTOs;
 
 namespace MovieCollection.Server.Controllers
 {
@@ -96,9 +97,9 @@ namespace MovieCollection.Server.Controllers
         [ProducesResponseType(typeof(List<UserProfileResponse>), 200)]
         [ProducesResponseType(typeof(Dictionary<string, string>), 400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] Paging paging)
         {
-            var result = await userService.GetAllUsersAsync(User);
+            var result = await userService.GetAllUsersAsync(User, paging);
 
             return ValidateResponse(result, HttpStatusCode.OK);
         }

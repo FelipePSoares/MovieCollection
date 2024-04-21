@@ -119,7 +119,7 @@ namespace MovieCollection.Application.Features.AccessControl
             return AppResponse<UserProfileResponse>.Success(user.ToUserProfileResponse());
         }
 
-        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user)
+        public async Task<AppResponse<List<UserProfileResponse>>> GetAllUsersAsync(ClaimsPrincipal user, Paging paging)
         {
             var userId = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
 
@@ -129,6 +129,7 @@ namespace MovieCollection.Application.Features.AccessControl
                 .Where(user => !user.HasIncompletedInformation && user.Enabled)
                 .Where(user => !adminUsers.Select(a => a.Id).Contains(user.Id))
                 .Where(user => string.IsNullOrEmpty(userId) ? true : user.Id != new Guid(userId))
+                .Skip(paging.PageNumber * paging.PageSize).Take(paging.PageSize)
                 .ToListAsync();
 
             return AppResponse<List<UserProfileResponse>>.Success(users.ToUserProfileResponse());
