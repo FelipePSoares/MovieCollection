@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Net;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.JsonPatch;
 using MockQueryable.Moq;
@@ -117,6 +118,9 @@ namespace MovieCollection.Application.Tests.Features
 
             this.movieRepositoryMock.Setup(movieRepository => movieRepository.InsertOrUpdate(It.IsAny<Movie>()))
                 .Returns(AppResponse<Movie>.Success(movie));
+
+            this.movieRepositoryMock.Setup(movieRepository => movieRepository.NoTrackable())
+                .Returns(new List<Movie>().BuildMock());
 
             this.genreServiceMock.Setup(genreService => genreService.RegisterAsync(It.IsAny<List<Genre>>()))
                 .ReturnsAsync(AppResponse<List<Genre>>.Success(movie.Genres));
